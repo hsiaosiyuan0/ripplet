@@ -6,7 +6,7 @@ Ripplet is aiming to become an efficient and lightweight script language by keep
 
 ## Development
 
-Ripplet is currently in prototyping stage, so it uses [ANTLR](https://www.antlr.org/) to generate its parser, however a handmade parser will be introduced once it  it enters a relatively stable stage.
+Ripplet is currently in a prototyping stage, so it uses [ANTLR](https://www.antlr.org/) to generate its parser, however a handmade parser will be introduced once it enters a relatively stable stage.
 
 ### Prerequisite
 

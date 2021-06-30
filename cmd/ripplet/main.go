@@ -31,56 +31,20 @@ func (s *TreeShapeListener) EnterIfStmt(ctx *parser.IfStmtContext) {
 	fmt.Println(ctx.GetText())
 }
 
+func (s *TreeShapeListener) EnterIdentifer(ctx *parser.IdentiferContext) {
+	fmt.Println("id: ", ctx.GetText())
+}
+
 func main() {
 	input := antlr.NewInputStream(`
-	a := {
-		ok b[1]
-	}
+	a := 1
+	fn b() {
+		c := 1
 	
-	a = match a {
-		ok(v) => v,
-		_ => ()
-	}
-	
-	b := if 1 then 2 else 3
-	
-	if 1 then {
-	
-	} else if s {
-	
-	} else {
-	
-	}
-	
-	repeat {
-	
-	} unit expr
-	
-	let a = () => {}
-	
-	fn f1() {
-		c := match number {
-			1 => true,
-			ok(v) => {name: v},
-			_ => false
+		d := () => {
+			e := 1
 		}
-		c
-	}
-	
-	object User {
-		first_name = 1,
-		last_name,
-		age,
-		bypass_data
-	
-		User(first_name) {
-			self.first_name = first_name
-		}
-	
-		full_name() {
-			first_name + last_name
-		}
-	}
+	}	
 	`)
 	lexer := parser.NewRippletLexer(input)
 	stream := antlr.NewCommonTokenStream(lexer, 0)

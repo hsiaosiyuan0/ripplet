@@ -104,6 +104,9 @@ type RippletParserListener interface {
 	// EnterVarDeclareStmt is called when entering the varDeclareStmt production.
 	EnterVarDeclareStmt(c *VarDeclareStmtContext)
 
+	// EnterVarDeclareLhs is called when entering the varDeclareLhs production.
+	EnterVarDeclareLhs(c *VarDeclareLhsContext)
+
 	// EnterExprStmt is called when entering the exprStmt production.
 	EnterExprStmt(c *ExprStmtContext)
 
@@ -122,14 +125,23 @@ type RippletParserListener interface {
 	// EnterMatchClauseTestVal is called when entering the matchClauseTestVal production.
 	EnterMatchClauseTestVal(c *MatchClauseTestValContext)
 
-	// EnterMatchClauseTestRes is called when entering the matchClauseTestRes production.
-	EnterMatchClauseTestRes(c *MatchClauseTestResContext)
+	// EnterMatchClauseTestUnwrap is called when entering the matchClauseTestUnwrap production.
+	EnterMatchClauseTestUnwrap(c *MatchClauseTestUnwrapContext)
 
 	// EnterMatchClauseVal is called when entering the matchClauseVal production.
 	EnterMatchClauseVal(c *MatchClauseValContext)
 
 	// EnterFnDeclareStmt is called when entering the fnDeclareStmt production.
 	EnterFnDeclareStmt(c *FnDeclareStmtContext)
+
+	// EnterFnName is called when entering the fnName production.
+	EnterFnName(c *FnNameContext)
+
+	// EnterIdentifer is called when entering the identifer production.
+	EnterIdentifer(c *IdentiferContext)
+
+	// EnterFormalParams is called when entering the formalParams production.
+	EnterFormalParams(c *FormalParamsContext)
 
 	// EnterFormalParamList is called when entering the formalParamList production.
 	EnterFormalParamList(c *FormalParamListContext)
@@ -290,6 +302,9 @@ type RippletParserListener interface {
 	// ExitVarDeclareStmt is called when exiting the varDeclareStmt production.
 	ExitVarDeclareStmt(c *VarDeclareStmtContext)
 
+	// ExitVarDeclareLhs is called when exiting the varDeclareLhs production.
+	ExitVarDeclareLhs(c *VarDeclareLhsContext)
+
 	// ExitExprStmt is called when exiting the exprStmt production.
 	ExitExprStmt(c *ExprStmtContext)
 
@@ -308,14 +323,23 @@ type RippletParserListener interface {
 	// ExitMatchClauseTestVal is called when exiting the matchClauseTestVal production.
 	ExitMatchClauseTestVal(c *MatchClauseTestValContext)
 
-	// ExitMatchClauseTestRes is called when exiting the matchClauseTestRes production.
-	ExitMatchClauseTestRes(c *MatchClauseTestResContext)
+	// ExitMatchClauseTestUnwrap is called when exiting the matchClauseTestUnwrap production.
+	ExitMatchClauseTestUnwrap(c *MatchClauseTestUnwrapContext)
 
 	// ExitMatchClauseVal is called when exiting the matchClauseVal production.
 	ExitMatchClauseVal(c *MatchClauseValContext)
 
 	// ExitFnDeclareStmt is called when exiting the fnDeclareStmt production.
 	ExitFnDeclareStmt(c *FnDeclareStmtContext)
+
+	// ExitFnName is called when exiting the fnName production.
+	ExitFnName(c *FnNameContext)
+
+	// ExitIdentifer is called when exiting the identifer production.
+	ExitIdentifer(c *IdentiferContext)
+
+	// ExitFormalParams is called when exiting the formalParams production.
+	ExitFormalParams(c *FormalParamsContext)
 
 	// ExitFormalParamList is called when exiting the formalParamList production.
 	ExitFormalParamList(c *FormalParamListContext)

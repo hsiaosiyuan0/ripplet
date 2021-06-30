@@ -25,8 +25,8 @@ expression:
   | expression Is expression                            # EqualityIsExpr
   | expression IsNot expression                         # EqualityIsNotExpr
   | Not expression                                      # NotExpr
-  | Identifier arguments                                # CallExpr
-  | '(' formalParamList ')' LambdaConnect fnBody        # FnExpr
+  | identifer arguments                                 # CallExpr
+  | formalParams LambdaConnect fnBody                   # FnExpr
   | <assoc=right> expression '**' expression            # PowerExpr
   | expression ('*' | Divide | '%') expression          # MulExpr
   | expression ('+' | '-')                              # AddExpr
@@ -35,7 +35,7 @@ expression:
 	| Ok expression                                       # OkExpr
 	| Err expression                                      # ErrExpr
 	| This																								# ThisExpr
-  | Identifier                                          # IdentifierExpr
+  | identifer                                           # IdentifierExpr
   | arrayLiteral                                        # ArrayExpr
   | objectLiteral                                       # ObjectExpr
   | literal                                             # LiteralExpr
@@ -53,11 +53,13 @@ objPropInit: expression;
 
 objMethods: objMethod+;
 
-objMethod: Identifier '(' formalParamList ')' blockStmt;
+objMethod: Identifier formalParams blockStmt;
 
-assignStmt: Identifier '=' statement;
+assignStmt: identifer '=' statement;
 
-varDeclareStmt: Identifier ':=' statement;
+varDeclareStmt: varDeclareLhs ':=' statement;
+
+varDeclareLhs: identifer;
 
 exprStmt: expression;
 
@@ -67,24 +69,30 @@ mathClauses: mathClause (',' mathClause)*;
 
 mathClause: matchClauseTest LambdaConnect statement;
 
-matchClauseTest: matchClauseTestVal | matchClauseTestRes | Discard;
+matchClauseTest: matchClauseTestVal | matchClauseTestUnwrap | Discard;
 
 matchClauseTestVal: matchClauseVal (Or matchClauseVal)*;
 
-matchClauseTestRes: (Ok | Err) '(' Identifier ')';
+matchClauseTestUnwrap: (Ok | Err) '(' identifer ')';
 
-matchClauseVal: Identifier | numberLiteral;
+matchClauseVal: identifer | numberLiteral;
 
-fnDeclareStmt: Fn Identifier '(' formalParamList? ')' fnBody;
+fnDeclareStmt: Fn fnName formalParams fnBody;
+
+fnName: identifer;
+
+identifer: Identifier;
+
+formalParams: '(' formalParamList? ')';
 
 formalParamList:
-  Identifier (',' Identifier)* (',' restParamArg)?
+  identifer (',' identifer)* (',' restParamArg)?
   | restParamArg
   ;
 
 fnBody: '{' statement* '}';
 
-restParamArg: Ellipsis Identifier;
+restParamArg: Ellipsis identifer;
 
 blockStmt: '{' statement* '}';
 

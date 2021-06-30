@@ -213,6 +213,12 @@ func (s *BaseRippletParserListener) EnterVarDeclareStmt(ctx *VarDeclareStmtConte
 // ExitVarDeclareStmt is called when production varDeclareStmt is exited.
 func (s *BaseRippletParserListener) ExitVarDeclareStmt(ctx *VarDeclareStmtContext) {}
 
+// EnterVarDeclareLhs is called when production varDeclareLhs is entered.
+func (s *BaseRippletParserListener) EnterVarDeclareLhs(ctx *VarDeclareLhsContext) {}
+
+// ExitVarDeclareLhs is called when production varDeclareLhs is exited.
+func (s *BaseRippletParserListener) ExitVarDeclareLhs(ctx *VarDeclareLhsContext) {}
+
 // EnterExprStmt is called when production exprStmt is entered.
 func (s *BaseRippletParserListener) EnterExprStmt(ctx *ExprStmtContext) {}
 
@@ -249,11 +255,11 @@ func (s *BaseRippletParserListener) EnterMatchClauseTestVal(ctx *MatchClauseTest
 // ExitMatchClauseTestVal is called when production matchClauseTestVal is exited.
 func (s *BaseRippletParserListener) ExitMatchClauseTestVal(ctx *MatchClauseTestValContext) {}
 
-// EnterMatchClauseTestRes is called when production matchClauseTestRes is entered.
-func (s *BaseRippletParserListener) EnterMatchClauseTestRes(ctx *MatchClauseTestResContext) {}
+// EnterMatchClauseTestUnwrap is called when production matchClauseTestUnwrap is entered.
+func (s *BaseRippletParserListener) EnterMatchClauseTestUnwrap(ctx *MatchClauseTestUnwrapContext) {}
 
-// ExitMatchClauseTestRes is called when production matchClauseTestRes is exited.
-func (s *BaseRippletParserListener) ExitMatchClauseTestRes(ctx *MatchClauseTestResContext) {}
+// ExitMatchClauseTestUnwrap is called when production matchClauseTestUnwrap is exited.
+func (s *BaseRippletParserListener) ExitMatchClauseTestUnwrap(ctx *MatchClauseTestUnwrapContext) {}
 
 // EnterMatchClauseVal is called when production matchClauseVal is entered.
 func (s *BaseRippletParserListener) EnterMatchClauseVal(ctx *MatchClauseValContext) {}
@@ -266,6 +272,24 @@ func (s *BaseRippletParserListener) EnterFnDeclareStmt(ctx *FnDeclareStmtContext
 
 // ExitFnDeclareStmt is called when production fnDeclareStmt is exited.
 func (s *BaseRippletParserListener) ExitFnDeclareStmt(ctx *FnDeclareStmtContext) {}
+
+// EnterFnName is called when production fnName is entered.
+func (s *BaseRippletParserListener) EnterFnName(ctx *FnNameContext) {}
+
+// ExitFnName is called when production fnName is exited.
+func (s *BaseRippletParserListener) ExitFnName(ctx *FnNameContext) {}
+
+// EnterIdentifer is called when production identifer is entered.
+func (s *BaseRippletParserListener) EnterIdentifer(ctx *IdentiferContext) {}
+
+// ExitIdentifer is called when production identifer is exited.
+func (s *BaseRippletParserListener) ExitIdentifer(ctx *IdentiferContext) {}
+
+// EnterFormalParams is called when production formalParams is entered.
+func (s *BaseRippletParserListener) EnterFormalParams(ctx *FormalParamsContext) {}
+
+// ExitFormalParams is called when production formalParams is exited.
+func (s *BaseRippletParserListener) ExitFormalParams(ctx *FormalParamsContext) {}
 
 // EnterFormalParamList is called when production formalParamList is entered.
 func (s *BaseRippletParserListener) EnterFormalParamList(ctx *FormalParamListContext) {}

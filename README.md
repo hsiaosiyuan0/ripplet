@@ -1,8 +1,8 @@
 # Ripplet
 
-Ripplet is a dynamically typed script language, it internally compile its source code to opcodes, and then a internal opcode interpreter is responsible for executing that opcodes.
+Ripplet is a dynamically typed script language, it internally compiles its source code to opcodes, and then a internal opcode interpreter is responsible for executing that opcodes.
 
-Ripplet is aiming to become a efficient and lightweight script language by keeping its
+Ripplet is aiming to become an efficient and lightweight script language by keeping its
 grammar as simple as possible and easy to be embedded in golang application.
 
 ## Development

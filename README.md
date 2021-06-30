@@ -7,6 +7,8 @@ grammar as simple as possible and easy to be embedded in golang application.
 
 ## Development
 
+Ripplet is currently in prototyping stage, so it uses [ANTLR](https://www.antlr.org/) to generate its parser, however a handmade will be introduced once a stable stage is arrived.
+
 ### Prerequisite
 
 - [ANTLR](https://www.antlr.org/) is required, macOS users can follow below command to install it:

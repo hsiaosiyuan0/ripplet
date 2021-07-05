@@ -369,11 +369,47 @@ func (s *BaseRippletParserListener) EnterNumberLiteral(ctx *NumberLiteralContext
 // ExitNumberLiteral is called when production numberLiteral is exited.
 func (s *BaseRippletParserListener) ExitNumberLiteral(ctx *NumberLiteralContext) {}
 
+// EnterIntLiteral is called when production intLiteral is entered.
+func (s *BaseRippletParserListener) EnterIntLiteral(ctx *IntLiteralContext) {}
+
+// ExitIntLiteral is called when production intLiteral is exited.
+func (s *BaseRippletParserListener) ExitIntLiteral(ctx *IntLiteralContext) {}
+
+// EnterHexLiteral is called when production hexLiteral is entered.
+func (s *BaseRippletParserListener) EnterHexLiteral(ctx *HexLiteralContext) {}
+
+// ExitHexLiteral is called when production hexLiteral is exited.
+func (s *BaseRippletParserListener) ExitHexLiteral(ctx *HexLiteralContext) {}
+
+// EnterRealLiteral is called when production realLiteral is entered.
+func (s *BaseRippletParserListener) EnterRealLiteral(ctx *RealLiteralContext) {}
+
+// ExitRealLiteral is called when production realLiteral is exited.
+func (s *BaseRippletParserListener) ExitRealLiteral(ctx *RealLiteralContext) {}
+
 // EnterStringLiteral is called when production stringLiteral is entered.
 func (s *BaseRippletParserListener) EnterStringLiteral(ctx *StringLiteralContext) {}
 
 // ExitStringLiteral is called when production stringLiteral is exited.
 func (s *BaseRippletParserListener) ExitStringLiteral(ctx *StringLiteralContext) {}
+
+// EnterStringQuoted is called when production stringQuoted is entered.
+func (s *BaseRippletParserListener) EnterStringQuoted(ctx *StringQuotedContext) {}
+
+// ExitStringQuoted is called when production stringQuoted is exited.
+func (s *BaseRippletParserListener) ExitStringQuoted(ctx *StringQuotedContext) {}
+
+// EnterStringInterp is called when production stringInterp is entered.
+func (s *BaseRippletParserListener) EnterStringInterp(ctx *StringInterpContext) {}
+
+// ExitStringInterp is called when production stringInterp is exited.
+func (s *BaseRippletParserListener) ExitStringInterp(ctx *StringInterpContext) {}
+
+// EnterStringInterpExpr is called when production stringInterpExpr is entered.
+func (s *BaseRippletParserListener) EnterStringInterpExpr(ctx *StringInterpExprContext) {}
+
+// ExitStringInterpExpr is called when production stringInterpExpr is exited.
+func (s *BaseRippletParserListener) ExitStringInterpExpr(ctx *StringInterpExprContext) {}
 
 // EnterArrayLiteral is called when production arrayLiteral is entered.
 func (s *BaseRippletParserListener) EnterArrayLiteral(ctx *ArrayLiteralContext) {}

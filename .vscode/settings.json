@@ -1,7 +1,10 @@
 {
     "cSpell.words": [
         "ANTLR",
+        "Consts",
         "Dlanguage",
-        "Upval"
+        "Instrs",
+        "Upval",
+        "Upvals"
     ]
 }

@@ -128,7 +128,7 @@ RegexpComment
 RegexpNewline
 RegexpContent
 RexexpClose
-StringInterpolataionStart
+StringInterpStart
 StringClose
 StringQuoted
 
@@ -194,7 +194,7 @@ RegexpComment
 RegexpNewline
 RegexpContent
 RexexpClose
-StringInterpolataionStart
+StringInterpStart
 StringClose
 StringQuoted
 QuotedText

@@ -515,7 +515,7 @@ var lexerSymbolicNames = []string{
 	"NotEquals", "LessThanEquals", "GreaterThanEquals", "LambdaConnect", "Ellipsis",
 	"Discard", "NilLiteral", "BooLiteral", "IntLiteral", "HexLiteral", "RealLiteral",
 	"Identifier", "StringOpen", "RegexpComment", "RegexpNewline", "RegexpContent",
-	"RexexpClose", "StringInterpolataionStart", "StringClose", "StringQuoted",
+	"RexexpClose", "StringInterpStart", "StringClose", "StringQuoted",
 }
 
 var lexerRuleNames = []string{
@@ -528,10 +528,10 @@ var lexerRuleNames = []string{
 	"NotEquals", "LessThanEquals", "GreaterThanEquals", "LambdaConnect", "Ellipsis",
 	"Discard", "NilLiteral", "BooLiteral", "IntLiteral", "HexLiteral", "RealLiteral",
 	"Identifier", "StringOpen", "RegexpComment", "RegexpNewline", "RegexpContent",
-	"RexexpClose", "StringInterpolataionStart", "StringClose", "StringQuoted",
-	"QuotedText", "HexDigit", "ExponentPart", "IdentifierStart", "IdentifierPart",
-	"EscapedCharacter", "SimpleEscapeSequence", "HexEscapeSequence", "UnicodeEscapeSequence",
-	"RegexpChar", "RegexpEscapeSequence",
+	"RexexpClose", "StringInterpStart", "StringClose", "StringQuoted", "QuotedText",
+	"HexDigit", "ExponentPart", "IdentifierStart", "IdentifierPart", "EscapedCharacter",
+	"SimpleEscapeSequence", "HexEscapeSequence", "UnicodeEscapeSequence", "RegexpChar",
+	"RegexpEscapeSequence",
 }
 
 type RippletLexer struct {
@@ -571,70 +571,70 @@ func NewRippletLexer(input antlr.CharStream) *RippletLexer {
 
 // RippletLexer tokens.
 const (
-	RippletLexerIf                        = 1
-	RippletLexerThen                      = 2
-	RippletLexerElse                      = 3
-	RippletLexerMatch                     = 4
-	RippletLexerFn                        = 5
-	RippletLexerRepeat                    = 6
-	RippletLexerUntil                     = 7
-	RippletLexerTypeof                    = 8
-	RippletLexerIs                        = 9
-	RippletLexerNot                       = 10
-	RippletLexerIsNot                     = 11
-	RippletLexerAnd                       = 12
-	RippletLexerOr                        = 13
-	RippletLexerBreak                     = 14
-	RippletLexerOk                        = 15
-	RippletLexerErr                       = 16
-	RippletLexerReturn                    = 17
-	RippletLexerObject                    = 18
-	RippletLexerThis                      = 19
-	RippletLexerLineTerminator            = 20
-	RippletLexerWhitespace                = 21
-	RippletLexerComment                   = 22
-	RippletLexerRegexpStart               = 23
-	RippletLexerBraceOpen                 = 24
-	RippletLexerBraceClose                = 25
-	RippletLexerBracketOpen               = 26
-	RippletLexerBracketClose              = 27
-	RippletLexerParenOpen                 = 28
-	RippletLexerParenClose                = 29
-	RippletLexerComma                     = 30
-	RippletLexerColon                     = 31
-	RippletLexerSemiColon                 = 32
-	RippletLexerDot                       = 33
-	RippletLexerPlus                      = 34
-	RippletLexerMinus                     = 35
-	RippletLexerPower                     = 36
-	RippletLexerMultiply                  = 37
-	RippletLexerDivide                    = 38
-	RippletLexerModulus                   = 39
-	RippletLexerDeclare                   = 40
-	RippletLexerAssign                    = 41
-	RippletLexerLessThan                  = 42
-	RippletLexerMoreThan                  = 43
-	RippletLexerEquals                    = 44
-	RippletLexerNotEquals                 = 45
-	RippletLexerLessThanEquals            = 46
-	RippletLexerGreaterThanEquals         = 47
-	RippletLexerLambdaConnect             = 48
-	RippletLexerEllipsis                  = 49
-	RippletLexerDiscard                   = 50
-	RippletLexerNilLiteral                = 51
-	RippletLexerBooLiteral                = 52
-	RippletLexerIntLiteral                = 53
-	RippletLexerHexLiteral                = 54
-	RippletLexerRealLiteral               = 55
-	RippletLexerIdentifier                = 56
-	RippletLexerStringOpen                = 57
-	RippletLexerRegexpComment             = 58
-	RippletLexerRegexpNewline             = 59
-	RippletLexerRegexpContent             = 60
-	RippletLexerRexexpClose               = 61
-	RippletLexerStringInterpolataionStart = 62
-	RippletLexerStringClose               = 63
-	RippletLexerStringQuoted              = 64
+	RippletLexerIf                = 1
+	RippletLexerThen              = 2
+	RippletLexerElse              = 3
+	RippletLexerMatch             = 4
+	RippletLexerFn                = 5
+	RippletLexerRepeat            = 6
+	RippletLexerUntil             = 7
+	RippletLexerTypeof            = 8
+	RippletLexerIs                = 9
+	RippletLexerNot               = 10
+	RippletLexerIsNot             = 11
+	RippletLexerAnd               = 12
+	RippletLexerOr                = 13
+	RippletLexerBreak             = 14
+	RippletLexerOk                = 15
+	RippletLexerErr               = 16
+	RippletLexerReturn            = 17
+	RippletLexerObject            = 18
+	RippletLexerThis              = 19
+	RippletLexerLineTerminator    = 20
+	RippletLexerWhitespace        = 21
+	RippletLexerComment           = 22
+	RippletLexerRegexpStart       = 23
+	RippletLexerBraceOpen         = 24
+	RippletLexerBraceClose        = 25
+	RippletLexerBracketOpen       = 26
+	RippletLexerBracketClose      = 27
+	RippletLexerParenOpen         = 28
+	RippletLexerParenClose        = 29
+	RippletLexerComma             = 30
+	RippletLexerColon             = 31
+	RippletLexerSemiColon         = 32
+	RippletLexerDot               = 33
+	RippletLexerPlus              = 34
+	RippletLexerMinus             = 35
+	RippletLexerPower             = 36
+	RippletLexerMultiply          = 37
+	RippletLexerDivide            = 38
+	RippletLexerModulus           = 39
+	RippletLexerDeclare           = 40
+	RippletLexerAssign            = 41
+	RippletLexerLessThan          = 42
+	RippletLexerMoreThan          = 43
+	RippletLexerEquals            = 44
+	RippletLexerNotEquals         = 45
+	RippletLexerLessThanEquals    = 46
+	RippletLexerGreaterThanEquals = 47
+	RippletLexerLambdaConnect     = 48
+	RippletLexerEllipsis          = 49
+	RippletLexerDiscard           = 50
+	RippletLexerNilLiteral        = 51
+	RippletLexerBooLiteral        = 52
+	RippletLexerIntLiteral        = 53
+	RippletLexerHexLiteral        = 54
+	RippletLexerRealLiteral       = 55
+	RippletLexerIdentifier        = 56
+	RippletLexerStringOpen        = 57
+	RippletLexerRegexpComment     = 58
+	RippletLexerRegexpNewline     = 59
+	RippletLexerRegexpContent     = 60
+	RippletLexerRexexpClose       = 61
+	RippletLexerStringInterpStart = 62
+	RippletLexerStringClose       = 63
+	RippletLexerStringQuoted      = 64
 )
 
 // RippletLexer modes.
@@ -649,7 +649,7 @@ func (l *RippletLexer) Action(localctx antlr.RuleContext, ruleIndex, actionIndex
 		l.BraceClose_Action(localctx, actionIndex)
 
 	case 61:
-		l.StringInterpolataionStart_Action(localctx, actionIndex)
+		l.StringInterpStart_Action(localctx, actionIndex)
 
 	default:
 		panic("No registered action for: " + fmt.Sprint(ruleIndex))
@@ -665,7 +665,7 @@ func (l *RippletLexer) BraceClose_Action(localctx antlr.RuleContext, actionIndex
 		panic("No registered action for: " + fmt.Sprint(actionIndex))
 	}
 }
-func (l *RippletLexer) StringInterpolataionStart_Action(localctx antlr.RuleContext, actionIndex int) {
+func (l *RippletLexer) StringInterpStart_Action(localctx antlr.RuleContext, actionIndex int) {
 	switch actionIndex {
 	case 1:
 		l.OpenBrace()

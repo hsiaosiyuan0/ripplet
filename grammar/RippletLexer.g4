@@ -90,7 +90,7 @@ RexexpClose: '/' -> popMode;
 
 mode StringMode;
 
-StringInterpolataionStart:
+StringInterpStart:
   '{' { l.OpenBrace(); } -> pushMode(DEFAULT_MODE);
 
 StringClose: '"' -> popMode;

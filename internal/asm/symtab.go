@@ -16,32 +16,39 @@ type Scope struct {
 	Subs   []*Scope
 
 	// formal parameters will be added in both `Params` and `Bindings`
-	Params   map[string]bool
-	Bindings map[string]bool
+	Params    map[string]int
+	ParamsLen int
+
+	Bindings    map[string]int
+	BindingsLen int
 }
 
 func NewScope() *Scope {
 	scope := &Scope{
-		Id:       0,
-		Subs:     make([]*Scope, 0),
-		Params:   make(map[string]bool),
-		Bindings: make(map[string]bool),
+		Id:          0,
+		Subs:        make([]*Scope, 0),
+		Params:      make(map[string]int),
+		ParamsLen:   0,
+		Bindings:    make(map[string]int),
+		BindingsLen: 0,
 	}
 	return scope
 }
 
 func (s *Scope) AddBinding(name string) {
-	s.Bindings[name] = true
+	s.Bindings[name] = s.BindingsLen
+	s.BindingsLen += 1
 }
 
 func (s *Scope) HasLocal(name string) bool {
-	return s.Bindings[name]
+	_, ok := s.Bindings[name]
+	return ok
 }
 
 func (s *Scope) HasBinding(name string) bool {
 	scope := s
 	for scope != nil {
-		if scope.Bindings[name] {
+		if scope.HasLocal(name) {
 			return true
 		}
 		scope = scope.Parent
@@ -50,11 +57,17 @@ func (s *Scope) HasBinding(name string) bool {
 }
 
 func (s *Scope) AddParam(name string) {
-	s.Params[name] = true
+	s.Params[name] = s.ParamsLen
+	s.ParamsLen += 1
 }
 
 func (s *Scope) HasParam(name string) bool {
-	return s.Params[name]
+	_, ok := s.Params[name]
+	return ok
+}
+
+func (s *Scope) LocalIdx(name string) int {
+	return s.Bindings[name]
 }
 
 type SymTab struct {

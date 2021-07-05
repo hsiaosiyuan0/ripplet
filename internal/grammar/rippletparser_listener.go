@@ -182,8 +182,26 @@ type RippletParserListener interface {
 	// EnterNumberLiteral is called when entering the numberLiteral production.
 	EnterNumberLiteral(c *NumberLiteralContext)
 
+	// EnterIntLiteral is called when entering the intLiteral production.
+	EnterIntLiteral(c *IntLiteralContext)
+
+	// EnterHexLiteral is called when entering the hexLiteral production.
+	EnterHexLiteral(c *HexLiteralContext)
+
+	// EnterRealLiteral is called when entering the realLiteral production.
+	EnterRealLiteral(c *RealLiteralContext)
+
 	// EnterStringLiteral is called when entering the stringLiteral production.
 	EnterStringLiteral(c *StringLiteralContext)
+
+	// EnterStringQuoted is called when entering the stringQuoted production.
+	EnterStringQuoted(c *StringQuotedContext)
+
+	// EnterStringInterp is called when entering the stringInterp production.
+	EnterStringInterp(c *StringInterpContext)
+
+	// EnterStringInterpExpr is called when entering the stringInterpExpr production.
+	EnterStringInterpExpr(c *StringInterpExprContext)
 
 	// EnterArrayLiteral is called when entering the arrayLiteral production.
 	EnterArrayLiteral(c *ArrayLiteralContext)
@@ -380,8 +398,26 @@ type RippletParserListener interface {
 	// ExitNumberLiteral is called when exiting the numberLiteral production.
 	ExitNumberLiteral(c *NumberLiteralContext)
 
+	// ExitIntLiteral is called when exiting the intLiteral production.
+	ExitIntLiteral(c *IntLiteralContext)
+
+	// ExitHexLiteral is called when exiting the hexLiteral production.
+	ExitHexLiteral(c *HexLiteralContext)
+
+	// ExitRealLiteral is called when exiting the realLiteral production.
+	ExitRealLiteral(c *RealLiteralContext)
+
 	// ExitStringLiteral is called when exiting the stringLiteral production.
 	ExitStringLiteral(c *StringLiteralContext)
+
+	// ExitStringQuoted is called when exiting the stringQuoted production.
+	ExitStringQuoted(c *StringQuotedContext)
+
+	// ExitStringInterp is called when exiting the stringInterp production.
+	ExitStringInterp(c *StringInterpContext)
+
+	// ExitStringInterpExpr is called when exiting the stringInterpExpr production.
+	ExitStringInterpExpr(c *StringInterpExprContext)
 
 	// ExitArrayLiteral is called when exiting the arrayLiteral production.
 	ExitArrayLiteral(c *ArrayLiteralContext)

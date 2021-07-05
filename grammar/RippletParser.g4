@@ -29,7 +29,7 @@ expression:
   | formalParams LambdaConnect fnBody                   # FnExpr
   | <assoc=right> expression '**' expression            # PowerExpr
   | expression ('*' | Divide | '%') expression          # MulExpr
-  | expression ('+' | '-')                              # AddExpr
+  | expression ('+' | '-') expression                   # AddExpr
   | expression And expression                           # LogicAndExpr
   | expression Or expression                            # LogicOrExpr
 	| Ok expression                                       # OkExpr
@@ -119,13 +119,22 @@ boolLiteral: BooLiteral;
 
 nilLiteral: NilLiteral;
 
-numberLiteral: IntLiteral | HexLiteral | RealLiteral;
+numberLiteral: intLiteral | hexLiteral | realLiteral;
+
+intLiteral: IntLiteral;
+
+hexLiteral: HexLiteral;
+
+realLiteral: RealLiteral;
 
 stringLiteral:
-  StringOpen (
-    StringQuoted
-    | (StringInterpolataionStart expression BraceClose)
-  )* StringClose;
+  StringOpen (StringQuoted | stringInterp)* StringClose;
+
+stringQuoted: StringQuoted;
+
+stringInterp: StringInterpStart stringInterpExpr BraceClose;
+
+stringInterpExpr: expression;
 
 arrayLiteral: '[' (expression (',' expression)*)* ']';
 

@@ -2,57 +2,61 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
+	asm "github.com/hsiaosiyuan0/ripplet/internal/asm"
 	parser "github.com/hsiaosiyuan0/ripplet/internal/grammar"
+	// vm "github.com/hsiaosiyuan0/ripplet/internal/vm"
 )
 
-type TreeShapeListener struct {
-	*parser.BaseRippletParserListener
-}
-
-func NewTreeShapeListener() *TreeShapeListener {
-	return new(TreeShapeListener)
-}
-
-// func (s *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
-// 	fmt.Println(ctx.GetText())
-// }
-
-func (s *TreeShapeListener) EnterMemterIdxExpr(ctx *parser.MemterIdxExprContext) {
-	// fmt.Println(ctx.GetText())
-}
-
-func (s *TreeShapeListener) EnterVarDeclareStmt(ctx *parser.VarDeclareStmtContext) {
-	// fmt.Println(ctx.GetText())
-}
-
-func (s *TreeShapeListener) EnterIfStmt(ctx *parser.IfStmtContext) {
-	fmt.Println(ctx.GetText())
-}
-
-func (s *TreeShapeListener) EnterIdentifer(ctx *parser.IdentiferContext) {
-	fmt.Println("id: ", ctx.GetText())
-}
-
-func main() {
-	input := antlr.NewInputStream(`
-	a := 1
-	fn b() {
-		c := 1
-	
-		d := () => {
-			e := 1
-		}
-	}	
-	`)
+func parse(code string) parser.IProgramContext {
+	input := antlr.NewInputStream(code)
 	lexer := parser.NewRippletLexer(input)
 	stream := antlr.NewCommonTokenStream(lexer, 0)
 	p := parser.NewRippletParser(stream)
-	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
+	// p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 	p.BuildParseTrees = true
 	tree := p.Program()
-	antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
+	return tree
+}
+
+func main() {
+	tree := parse(`
+	a := 1 
+	b := 2
+	c := 3
+  d := a + b * c
+
+	// CONST
+	// INDEX
+	// STORE
+	// INDEX
+	// CONST
+	// INDEX
+	// STORE
+	// INDEX
+	// LOAD
+	// INDEX
+	// LOAD
+	// INDEX
+	// CALL
+	// INDEX
+	`)
+
+	s := asm.NewSymTabListener()
+	symtab, err := s.Resolve(&tree)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c := asm.NewCodegenListener(symtab)
+	c.Resolve(&tree)
+	fn := c.Finalize().Fn
+	fmt.Println(fn.Dump())
+
+	// vm := vm.NewVm()
+	// vm.Exec(&fn)
 
 	// p := parser.NewJSONParser(stream)
 	// p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))

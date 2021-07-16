@@ -2,63 +2,30 @@ package main
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/antlr/antlr4/runtime/Go/antlr"
-	asm "github.com/hsiaosiyuan0/ripplet/internal/asm"
-	parser "github.com/hsiaosiyuan0/ripplet/internal/grammar"
-	// vm "github.com/hsiaosiyuan0/ripplet/internal/vm"
+	vm "github.com/hsiaosiyuan0/ripplet/internal/vm"
 )
 
-func parse(code string) parser.IProgramContext {
-	input := antlr.NewInputStream(code)
-	lexer := parser.NewRippletLexer(input)
-	stream := antlr.NewCommonTokenStream(lexer, 0)
-	p := parser.NewRippletParser(stream)
-	// p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
-	p.BuildParseTrees = true
-	tree := p.Program()
-	return tree
-}
-
 func main() {
-	tree := parse(`
-	a := 1 
-	b := 2
-	c := 3
-  d := a + b * c
+	code := `
+	a := "hello world"
+	b := 1
+	print(a, b)
+	`
 
-	// CONST
-	// INDEX
-	// STORE
-	// INDEX
-	// CONST
-	// INDEX
-	// STORE
-	// INDEX
-	// LOAD
-	// INDEX
-	// LOAD
-	// INDEX
-	// CALL
-	// INDEX
-	`)
+	print := &vm.GoFn{
+		Name: "print",
+		Impl: func(args *vm.Args) interface{} {
+			for i := 0; i < args.Len; i++ {
+				fmt.Println(args.Get(i))
+			}
 
-	s := asm.NewSymTabListener()
-	symtab, err := s.Resolve(&tree)
-	if err != nil {
-		log.Fatal(err)
+			return nil
+		},
 	}
 
-	c := asm.NewCodegenListener(symtab)
-	c.Resolve(&tree)
-	fn := c.Finalize().Fn
-	fmt.Println(fn.Dump())
+	vm := vm.NewVm(nil)
+	vm.AddExtFn(print)
 
-	// vm := vm.NewVm()
-	// vm.Exec(&fn)
-
-	// p := parser.NewJSONParser(stream)
-	// p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
-	// p.BuildParseTrees = true
+	vm.SetCode(code).Exec()
 }

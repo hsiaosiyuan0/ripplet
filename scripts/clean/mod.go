@@ -32,5 +32,5 @@ func cleanDir(dir string, exclude []string) {
 
 func main() {
 	// `ripplet_lexer_base.go` is our custom base definition, keep it
-	cleanDir("./internal/grammar", []string{"ripplet_lexer_base.go"})
+	cleanDir("./internal/grammar", []string{"ripplet_lexer_base.go", "parser.go"})
 }

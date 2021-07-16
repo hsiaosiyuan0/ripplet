@@ -18,21 +18,15 @@ func (l *RippletLexerBase) NextToken() antlr.Token {
 }
 
 func (l *RippletLexerBase) OpenBrace() {
-	if len(l.braces) != 0 {
-		braces := l.braces[:]
-		cnt := len(braces)
-		last, braces := braces[cnt-1], braces[:cnt-1]
-		if last == 0 {
-			l.PopMode()
-		} else {
-			braces = append(braces, last)
-		}
-		l.braces = braces
-	}
+	l.braces = append(l.braces, 1)
 }
 
 func (l *RippletLexerBase) CloseBrace() {
-	l.braces = append(l.braces, 1)
+	if len(l.braces) != 0 {
+		braces := l.braces[:]
+		l.PopMode()
+		l.braces = braces[:len(braces)-1]
+	}
 }
 
 func (l *RippletLexerBase) IsRegexCanStart() bool {

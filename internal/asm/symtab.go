@@ -36,6 +36,9 @@ func NewScope() *Scope {
 }
 
 func (s *Scope) AddBinding(name string) {
+	if s.HasLocal(name) {
+		return
+	}
 	s.Bindings[name] = s.BindingsLen
 	s.BindingsLen += 1
 }
@@ -67,21 +70,31 @@ func (s *Scope) HasParam(name string) bool {
 }
 
 func (s *Scope) LocalIdx(name string) int {
-	return s.Bindings[name]
+	if s.HasLocal(name) {
+		return s.Bindings[name]
+	}
+	return -1
+}
+
+func (s *Scope) LocalCnt() int {
+	return len(s.Bindings)
 }
 
 type SymTab struct {
-	Scopes map[uint]*Scope
-	Root   *Scope
-	Cur    *Scope
+	Externals []string
+	Scopes    map[uint]*Scope
+	Root      *Scope
+	Cur       *Scope
 }
 
-func NewSymTab() *SymTab {
+func NewSymTab(externals []string) *SymTab {
 	scope := NewScope()
+
 	symtab := &SymTab{
-		Scopes: make(map[uint]*Scope),
-		Root:   scope,
-		Cur:    scope,
+		Externals: externals,
+		Scopes:    make(map[uint]*Scope),
+		Root:      scope,
+		Cur:       scope,
 	}
 	symtab.Scopes[scope.Id] = scope
 	return symtab
@@ -102,6 +115,15 @@ func (s *SymTab) LeaveScope() {
 	s.Cur = s.Cur.Parent
 }
 
+func (s *SymTab) HasExternal(name string) bool {
+	for _, ext := range s.Externals {
+		if ext == name {
+			return true
+		}
+	}
+	return false
+}
+
 type SymTabListener struct {
 	*parser.BaseRippletParserListener
 
@@ -112,10 +134,18 @@ type SymTabListener struct {
 	inFormalParamList bool
 }
 
-func NewSymTabListener() *SymTabListener {
+func NewSymTabListener(externals []string) *SymTabListener {
 	s := new(SymTabListener)
-	s.symtab = NewSymTab()
+	s.symtab = NewSymTab(externals)
 	return s
+}
+
+func (s *SymTabListener) EnterProgram(ctx *parser.ProgramContext) {
+	s.symtab.EnterScope()
+}
+
+func (s *SymTabListener) ExitProgram(ctx *parser.ProgramContext) {
+	s.symtab.LeaveScope()
 }
 
 func (s *SymTabListener) Resolve(tree *parser.IProgramContext) (symtab *SymTab, err error) {
@@ -188,7 +218,7 @@ func (s *SymTabListener) EnterIdentifer(ctx *parser.IdentiferContext) {
 		s.symtab.Cur.AddBinding(name)
 	}
 
-	if !s.symtab.Cur.HasBinding(name) {
+	if !s.symtab.Cur.HasBinding(name) && !s.symtab.HasExternal(name) {
 		sym := ctx.GetToken(parser.RippletLexerIdentifier, 0).GetSymbol()
 		sourceName := sym.GetInputStream().GetSourceName()
 		line := sym.GetLine()

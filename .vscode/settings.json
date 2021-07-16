@@ -5,6 +5,8 @@
         "Dlanguage",
         "Instrs",
         "Upval",
-        "Upvals"
+        "Upvals",
+        "gofn",
+        "opds"
     ]
 }

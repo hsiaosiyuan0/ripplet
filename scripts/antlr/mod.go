@@ -27,6 +27,6 @@ func patchLexer() {
 
 func main() {
 	utils.Shell("antlr", "-Dlanguage=Go", "./grammar/RippletLexer.g4", "-o", "./internal/")
-	utils.Shell("antlr", "-Dlanguage=Go", "./grammar/RippletParser.g4", "-lib", "./internal/grammar", "-o", "./internal/")
+	utils.Shell("antlr", "-Dlanguage=Go", "./grammar/RippletParser.g4", "-visitor", "-lib", "./internal/grammar", "-o", "./internal/")
 	patchLexer()
 }

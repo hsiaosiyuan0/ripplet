@@ -2,7 +2,10 @@ package asm
 
 import (
 	"fmt"
+	"log"
 	"strings"
+
+	parser "github.com/hsiaosiyuan0/ripplet/internal/grammar"
 )
 
 type Position struct {
@@ -11,10 +14,11 @@ type Position struct {
 }
 
 type FnShape struct {
-	Pos    Position
-	Instrs []int
-	Upvals []string
-	Subs   []*FnShape
+	Pos      Position
+	LocalCnt int
+	Instrs   []int
+	Upvals   []string
+	Subs     []*FnShape
 }
 
 func NewFnShape() *FnShape {
@@ -25,18 +29,31 @@ func NewFnShape() *FnShape {
 	}
 }
 
-func (f *FnShape) Dump() string {
+func (f *FnShape) Dump(chunk *Chunk) string {
 	var b strings.Builder
 	for i := 0; i < len(f.Instrs); i++ {
 		op := Opcode(f.Instrs[i])
 		switch op {
-		case CONST, LOAD, STORE:
+		case CONST, LOAD, STORE, CLOSURE, CONCAT:
 			fmt.Fprint(&b, op.String()+"\n")
 			i++
 			fmt.Fprintf(&b, "INDEX_%d\n", f.Instrs[i])
+		case CALL:
+			fmt.Fprint(&b, op.String()+"\n")
+			i++
+			fmt.Fprintf(&b, "CNT_%d\n", f.Instrs[i])
+		case LOAD_UP, STORE_UP, LOAD_EXT:
+			fmt.Fprint(&b, op.String()+"\n")
+			i++
+			fmt.Fprintf(&b, "NAME_%s\n", chunk.ConstStr(f.Instrs[i]))
 		default:
 			fmt.Fprintf(&b, "%s\n", op.String())
 		}
+	}
+
+	for i, sub := range f.Subs {
+		fmt.Fprintf(&b, "\nSub: %d\n", i)
+		fmt.Fprintf(&b, "%s", sub.Dump(chunk))
 	}
 	return b.String()
 }
@@ -68,12 +85,66 @@ func NewChunk() *Chunk {
 	}
 }
 
+func (c *Chunk) ConstStr(i int) string {
+	return c.Consts[i].Val.(string)
+}
+
+func (c *Chunk) GetConst(i int) *Const {
+	return c.Consts[i]
+}
+
+func (c *Chunk) IdxOfConstStr(str string) int {
+	for i, c := range c.Consts {
+		if c.Typ == ConstStr && c.Val == str {
+			return i
+		}
+	}
+	return -1
+}
+
+func (c *Chunk) IdxOfConstNum(num float64) int {
+	for i, c := range c.Consts {
+		if c.Typ == ConstNum && c.Val == num {
+			return i
+		}
+	}
+	return -1
+}
+
 func (c *Chunk) AddConstStr(str string) int {
+	if i := c.IdxOfConstStr(str); i != -1 {
+		return i
+	}
+
+	i := len(c.Consts)
 	c.Consts = append(c.Consts, &Const{Typ: ConstStr, Val: str})
-	return len(c.Consts)
+	return i
 }
 
 func (c *Chunk) AddConstNum(num float64) int {
+	if i := c.IdxOfConstNum(num); i != -1 {
+		return i
+	}
+
+	i := len(c.Consts)
 	c.Consts = append(c.Consts, &Const{Typ: ConstNum, Val: num})
-	return len(c.Consts)
+	return i
+}
+
+func (c *Chunk) Dump() string {
+	return c.Fn.Dump(c)
+}
+
+func Compile(code string, externals []string) *Chunk {
+	tree := parser.Parse(code)
+
+	s := NewSymTabListener(externals)
+	symtab, err := s.Resolve(&tree)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c := NewCodegenVisitor(symtab)
+	c.Visit(tree)
+	return c.Finalize()
 }

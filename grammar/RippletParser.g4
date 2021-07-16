@@ -25,7 +25,7 @@ expression:
   | expression Is expression                            # EqualityIsExpr
   | expression IsNot expression                         # EqualityIsNotExpr
   | Not expression                                      # NotExpr
-  | identifer arguments                                 # CallExpr
+  | expression arguments                                 # CallExpr
   | formalParams LambdaConnect fnBody                   # FnExpr
   | <assoc=right> expression '**' expression            # PowerExpr
   | expression ('*' | Divide | '%') expression          # MulExpr
@@ -102,7 +102,7 @@ repeatStmt: Repeat statement Until expression;
 
 arguments: '(' (argument (',' argument)* ','?)? ')';
 
-argument: Ellipsis? (expression | Identifier);
+argument: Ellipsis? expression;
 
 literal:
   nilLiteral
@@ -128,7 +128,7 @@ hexLiteral: HexLiteral;
 realLiteral: RealLiteral;
 
 stringLiteral:
-  StringOpen (StringQuoted | stringInterp)* StringClose;
+  StringOpen (stringQuoted | stringInterp)* StringClose;
 
 stringQuoted: StringQuoted;
 

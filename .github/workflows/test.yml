@@ -13,8 +13,8 @@ jobs:
       with:
         go-version: ${{ matrix.go-version }}
     - name: Checkout code
-      uses: actions/checkout@v2
-		- name: Antlr Generation
-			run: make antlr
+    	uses: actions/checkout@v2
+    - name: Antlr Generation
+      run: make antlr
     - name: Test
       run: make test

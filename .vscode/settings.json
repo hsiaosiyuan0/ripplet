@@ -3,6 +3,7 @@
         "ANTLR",
         "Consts",
         "Dlanguage",
+        "GOARCH",
         "Instrs",
         "Upval",
         "Upvals",

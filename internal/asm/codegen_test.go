@@ -8,6 +8,18 @@ import (
 	utils "github.com/hsiaosiyuan0/ripplet/internal/utils"
 )
 
+func trimLines(str string) string {
+	lines := strings.Split(str, "\n")
+	ret := make([]string, 0)
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+		ret = append(ret, strings.TrimSpace(line))
+	}
+	return strings.Join(ret, "\n")
+}
+
 func assertOpcodesEq(t *testing.T, code string, opcodes string) {
 	tree := parser.Parse(code)
 
@@ -20,16 +32,7 @@ func assertOpcodesEq(t *testing.T, code string, opcodes string) {
 	c := NewCodegenVisitor(symtab)
 	c.Visit(tree)
 
-	ops := strings.Split(opcodes, "\n")
-	opsTrim := make([]string, 0)
-	for _, op := range ops {
-		if op == "" {
-			continue
-		}
-		opsTrim = append(opsTrim, strings.TrimSpace(op))
-	}
-
-	utils.AssertEqual(t, strings.TrimSpace(c.Finalize().Dump()), strings.Join(opsTrim, "\n"), "")
+	utils.AssertEqual(t, trimLines(c.Finalize().Dump()), trimLines(opcodes), "")
 }
 
 func TestVarDec(t *testing.T) {

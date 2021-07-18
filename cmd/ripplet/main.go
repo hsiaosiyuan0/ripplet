@@ -8,16 +8,20 @@ import (
 
 func main() {
 	code := `
-	a := "hello world"
-	b := 1
-	print(a, b)
+a := 1
+repeat {
+	a = a + 1
+  if a > 10 then break
+}
+print(a)
 	`
 
 	print := &vm.GoFn{
 		Name: "print",
 		Impl: func(args *vm.Args) interface{} {
 			for i := 0; i < args.Len; i++ {
-				fmt.Println(args.Get(i))
+				arg := args.Get(i)
+				fmt.Println(arg)
 			}
 
 			return nil
@@ -27,5 +31,8 @@ func main() {
 	vm := vm.NewVm(nil)
 	vm.AddExtFn(print)
 
-	vm.SetCode(code).Exec()
+	vm.SetCode(code)
+	fmt.Println(vm.GetChunk().Fn.Dump(vm.GetChunk()))
+
+	vm.Exec()
 }

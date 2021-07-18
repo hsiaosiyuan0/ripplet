@@ -9,13 +9,14 @@ import (
 
 type Closure struct {
 	fn     *asm.FnShape
-	uppers map[string]interface{}
+	args   *Args
+	uppers map[string]*Object
 }
 
 func NewClosure(fn *asm.FnShape) *Closure {
 	return &Closure{
 		fn:     fn,
-		uppers: make(map[string]interface{}),
+		uppers: make(map[string]*Object),
 	}
 }
 
@@ -37,6 +38,129 @@ type Object struct {
 	Data interface{}
 }
 
+func (o *Object) AsBool() *Object {
+	switch o.Typ {
+	case NUM:
+		n := o.Data.(float64)
+		if n != 0 {
+			return tureObj
+		}
+
+	case STR:
+		s := o.Data.(string)
+		if len(s) > 0 {
+			return tureObj
+		}
+
+	case BOOL:
+		b := o.Data.(bool)
+		if b {
+			return tureObj
+		}
+
+	case ARR, DIC, CLOSURE, GFN:
+		return tureObj
+
+	}
+
+	return falseObj
+}
+
+func (o *Object) GT(rhs *Object) *Object {
+	if o.Typ != rhs.Typ {
+		return falseObj
+	}
+	switch o.Typ {
+	case STR:
+		op1 := o.Data.(string)
+		op2 := rhs.Data.(string)
+		if strings.Compare(op1, op2) == 1 {
+			return tureObj
+		}
+
+	case NUM:
+		op1 := o.Data.(float64)
+		op2 := rhs.Data.(float64)
+		if op1 > op2 {
+			return tureObj
+		}
+	}
+
+	return falseObj
+}
+
+func (o *Object) GE(rhs *Object) *Object {
+	if o.Typ != rhs.Typ {
+		return falseObj
+	}
+	switch o.Typ {
+	case STR:
+		op1 := o.Data.(string)
+		op2 := rhs.Data.(string)
+		cmp := strings.Compare(op1, op2)
+		if cmp == 1 || cmp == 0 {
+			return tureObj
+		}
+
+	case NUM:
+		op1 := o.Data.(float64)
+		op2 := rhs.Data.(float64)
+		if op1 >= op2 {
+			return tureObj
+		}
+	}
+
+	return falseObj
+}
+
+func (o *Object) LT(rhs *Object) *Object {
+	if o.Typ != rhs.Typ {
+		return falseObj
+	}
+	switch o.Typ {
+	case STR:
+		op1 := o.Data.(string)
+		op2 := rhs.Data.(string)
+		cmp := strings.Compare(op1, op2)
+		if cmp == -1 {
+			return tureObj
+		}
+
+	case NUM:
+		op1 := o.Data.(float64)
+		op2 := rhs.Data.(float64)
+		if op1 < op2 {
+			return tureObj
+		}
+	}
+
+	return falseObj
+}
+
+func (o *Object) LE(rhs *Object) *Object {
+	if o.Typ != rhs.Typ {
+		return falseObj
+	}
+	switch o.Typ {
+	case STR:
+		op1 := o.Data.(string)
+		op2 := rhs.Data.(string)
+		cmp := strings.Compare(op1, op2)
+		if cmp == -1 || cmp == 0 {
+			return tureObj
+		}
+
+	case NUM:
+		op1 := o.Data.(float64)
+		op2 := rhs.Data.(float64)
+		if op1 <= op2 {
+			return tureObj
+		}
+	}
+
+	return falseObj
+}
+
 type Fn struct {
 }
 
@@ -50,11 +174,31 @@ var nilObj = &Object{
 	Data: nil,
 }
 
+var tureObj = &Object{
+	Typ:  BOOL,
+	Data: true,
+}
+
+var falseObj = &Object{
+	Typ:  BOOL,
+	Data: false,
+}
+
 func (a *Args) Get(i int) *Object {
 	if i < a.Len {
 		return a.slots[i]
 	}
 	return nilObj
+}
+
+func (a *Args) shift() *Object {
+	if len(a.slots) == 0 {
+		return nilObj
+	}
+
+	arg, rest := a.slots[0], a.slots[1:]
+	a.slots = rest
+	return arg
 }
 
 type GoFnImpl func(*Args) interface{}
@@ -66,18 +210,19 @@ type GoFn struct {
 
 type CallFrame struct {
 	*Closure
-	pc int
 
 	locals []*Object
+	prev   *CallFrame
 
-	prev *CallFrame
+	pc   int
+	base int
 }
 
-func NewCallFrame(fn *asm.FnShape) *CallFrame {
+func NewCallFrame(closure *Closure) *CallFrame {
 	frame := &CallFrame{
-		locals: make([]*Object, fn.LocalCnt),
+		locals: make([]*Object, closure.fn.LocalCnt),
 	}
-	frame.Closure = NewClosure(fn)
+	frame.Closure = closure
 	return frame
 }
 
@@ -94,6 +239,10 @@ func NewVm(chunk *asm.Chunk) *Vm {
 		opds:      make([]*Object, 0),
 		externals: make(map[string]*Object),
 	}
+}
+
+func (v *Vm) GetChunk() *asm.Chunk {
+	return v.chunk
 }
 
 func (v *Vm) pushOperand(obj *Object) {
@@ -124,6 +273,7 @@ func (v *Vm) fetchOp() asm.Opcode {
 
 func (v *Vm) dispatch(op asm.Opcode) {
 	switch op {
+
 	case asm.CONST:
 		c := v.chunk.GetConst(v.fetchInstr())
 		typ := NUM
@@ -131,14 +281,25 @@ func (v *Vm) dispatch(op asm.Opcode) {
 			typ = STR
 		}
 		v.pushOperand(&Object{Typ: typ, Data: c.Val})
+
 	case asm.STORE:
 		i := v.fetchInstr()
 		v.cf.locals[i] = v.popOperand()
+
+	case asm.LOAD:
+		i := v.fetchInstr()
+		v.pushOperand(v.cf.locals[i])
+
 	case asm.LOAD_EXT:
 		i := v.fetchInstr()
 		nameConst := v.chunk.GetConst(i)
 		name := nameConst.Val.(string)
 		v.pushOperand(v.externals[name])
+
+	case asm.LOAD_ARG:
+		i := v.fetchInstr()
+		v.cf.locals[i] = v.cf.args.shift()
+
 	case asm.CALL:
 		argsLen := v.fetchInstr() - 1
 		args := &Args{
@@ -149,20 +310,42 @@ func (v *Vm) dispatch(op asm.Opcode) {
 			args.slots[i] = v.popOperand()
 		}
 
-		closure := v.popOperand()
-		if closure.Typ == GFN {
-			gfn := closure.Data.(GoFnImpl)
+		target := v.popOperand()
+		if target.Typ == GFN {
+			gfn := target.Data.(GoFnImpl)
 			gfn(args)
+		} else if target.Typ == CLOSURE {
+			closure := target.Data.(*Closure)
+			closure.args = args
+			cf := NewCallFrame(closure)
+			cf.base = len(v.opds)
+			cf.prev = v.cf
+			v.cf = cf
 		} else {
-			panic("not implemented")
+			panic(fmt.Errorf("obj is not callable %v", target))
 		}
+
+	case asm.RET:
+		// shrink opds for releasing those useless operands
+		opds := make([]*Object, v.cf.base)
+		copy(opds, v.opds)
+
+		retVal := nilObj
+		opdsLen := len(v.opds)
+		if opdsLen > 0 {
+			retVal = v.opds[opdsLen-1]
+		}
+
+		v.opds = append(opds, retVal)
+		v.cf = v.cf.prev
+
 	case asm.CONCAT:
 		subsLen := v.fetchInstr()
 		subs := make([]string, subsLen)
 
 		for i := 0; i < subsLen; i++ {
 			opd := v.popOperand()
-			// FIXME: toString
+			// TODO: toString
 			ss := opd.Data.(string)
 			subs = append(subs, ss)
 		}
@@ -171,15 +354,150 @@ func (v *Vm) dispatch(op asm.Opcode) {
 			Typ:  STR,
 			Data: strings.Join(subs, ""),
 		})
-	case asm.LOAD:
-		i := v.fetchInstr()
-		v.pushOperand(v.cf.locals[i])
+
 	case asm.CLOSURE:
-		fmt.Printf(op.String() + "\n")
-		fmt.Printf("INDEX_%d\n", v.fetchInstr())
-	case asm.LOAD_UP, asm.STORE_UP:
-		fmt.Printf(op.String() + "\n")
-		fmt.Printf("NAME_%s\n", v.chunk.ConstStr(v.fetchInstr()))
+		i := v.fetchInstr()
+		shape := v.cf.fn.Subs[i]
+
+		closure := &Closure{
+			fn:     shape,
+			uppers: make(map[string]*Object),
+		}
+
+		for name, loc := range shape.Upvals {
+			if loc.Typ == asm.UP_LOC_LOCAL {
+				closure.uppers[name] = v.cf.locals[loc.At.(int)]
+			} else {
+				closure.uppers[name] = v.cf.uppers[name]
+			}
+		}
+
+		v.pushOperand(&Object{
+			Typ:  CLOSURE,
+			Data: closure,
+		})
+
+	case asm.LOAD_UP:
+		name := v.chunk.ConstStr(v.fetchInstr())
+		v.pushOperand(v.cf.uppers[name])
+
+	case asm.STORE_UP:
+		name := v.chunk.ConstStr(v.fetchInstr())
+		v.cf.uppers[name] = v.popOperand()
+
+	case asm.ADD:
+		op2 := v.popOperand()
+		op1 := v.popOperand()
+		// TODO: implicitly data converting
+		res := op1.Data.(float64) + op2.Data.(float64)
+		v.pushOperand(&Object{
+			Typ:  NUM,
+			Data: res,
+		})
+
+	case asm.SUB:
+		op2 := v.popOperand()
+		op1 := v.popOperand()
+		// TODO: implicitly data converting
+		res := op1.Data.(float64) - op2.Data.(float64)
+		v.pushOperand(&Object{
+			Typ:  NUM,
+			Data: res,
+		})
+
+	case asm.MUL:
+		op2 := v.popOperand()
+		op1 := v.popOperand()
+		// TODO: implicitly data converting
+		res := op1.Data.(float64) * op2.Data.(float64)
+		v.pushOperand(&Object{
+			Typ:  NUM,
+			Data: res,
+		})
+
+	case asm.DIV:
+		op2 := v.popOperand()
+		op1 := v.popOperand()
+		// TODO: implicitly data converting
+		res := op1.Data.(float64) / op2.Data.(float64)
+		v.pushOperand(&Object{
+			Typ:  NUM,
+			Data: res,
+		})
+
+	case asm.ARR:
+		cnt := v.fetchInstr()
+		arr := make([]*Object, cnt)
+		for i := cnt - 1; i >= 0; i-- {
+			arr[i] = v.popOperand()
+		}
+		v.pushOperand(&Object{
+			Typ:  ARR,
+			Data: arr,
+		})
+
+	case asm.SUBSCRIPT:
+		// TODO: type assert
+		idx := int(v.popOperand().Data.(float64))
+		arr := v.popOperand().Data.([]*Object)
+		// TODO: boundary check
+		item := arr[idx]
+		v.pushOperand(item)
+
+	case asm.TEST:
+		opd := v.popOperand()
+		v.pushOperand(opd.AsBool())
+
+	case asm.JMP_F:
+		cond := v.popOperand()
+		ofst := v.fetchInstr()
+		if !cond.Data.(bool) {
+			v.cf.pc += ofst
+		}
+
+	case asm.JMP:
+		ofst := v.fetchInstr()
+		v.cf.pc += ofst
+
+	case asm.GT, asm.GE, asm.LT, asm.LE:
+		op2 := v.popOperand()
+		op1 := v.popOperand()
+
+		switch op {
+		case asm.GT:
+			v.pushOperand(op1.GT(op2))
+		case asm.GE:
+			v.pushOperand(op1.GE(op2))
+		case asm.LT:
+			v.pushOperand(op1.LT(op2))
+		case asm.LE:
+			v.pushOperand(op1.LE(op2))
+		}
+
+	case asm.AND, asm.OR:
+		op2 := v.popOperand().AsBool().Data.(bool)
+		op1 := v.popOperand().AsBool().Data.(bool)
+
+		if op == asm.ADD && op1 && op2 {
+			v.pushOperand(tureObj)
+		} else if op == asm.OR && (op1 || op2) {
+			v.pushOperand(tureObj)
+		} else {
+			v.pushOperand(falseObj)
+		}
+
+	case asm.IS, asm.IS_NOT:
+		op2 := v.popOperand().Data
+		op1 := v.popOperand().Data
+
+		if op == asm.IS && op1 == op2 {
+			v.pushOperand(tureObj)
+		} else if op == asm.IS_NOT && (op1 != op2) {
+			v.pushOperand(tureObj)
+		} else {
+			v.pushOperand(falseObj)
+		}
+
 	default:
 		fmt.Printf("%s\n", op.String())
 	}
@@ -207,7 +525,7 @@ func (v *Vm) SetCode(code string) *Vm {
 }
 
 func (v *Vm) Exec() {
-	v.cf = NewCallFrame(&v.chunk.Fn)
+	v.cf = NewCallFrame(NewClosure(&v.chunk.Fn))
 
 	for v.hasInstr() {
 		op := v.fetchOp()

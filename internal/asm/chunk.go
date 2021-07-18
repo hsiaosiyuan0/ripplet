@@ -13,18 +13,30 @@ type Position struct {
 	Column int
 }
 
+type UpLocType int
+
+const (
+	UP_LOC_LOCAL UpLocType = iota
+	UP_LOC_UP
+)
+
+type UpLoc struct {
+	Typ UpLocType
+	At  interface{}
+}
+
 type FnShape struct {
 	Pos      Position
 	LocalCnt int
 	Instrs   []int
-	Upvals   []string
+	Upvals   map[string]UpLoc
 	Subs     []*FnShape
 }
 
 func NewFnShape() *FnShape {
 	return &FnShape{
 		Instrs: make([]int, 0),
-		Upvals: make([]string, 0),
+		Upvals: make(map[string]UpLoc, 0),
 		Subs:   make([]*FnShape, 0),
 	}
 }
@@ -34,11 +46,11 @@ func (f *FnShape) Dump(chunk *Chunk) string {
 	for i := 0; i < len(f.Instrs); i++ {
 		op := Opcode(f.Instrs[i])
 		switch op {
-		case CONST, LOAD, STORE, CLOSURE, CONCAT:
+		case CONST, LOAD, STORE, CLOSURE, CONCAT, JMP, JMP_F:
 			fmt.Fprint(&b, op.String()+"\n")
 			i++
-			fmt.Fprintf(&b, "INDEX_%d\n", f.Instrs[i])
-		case CALL:
+			fmt.Fprintf(&b, "OPD_%d\n", f.Instrs[i])
+		case CALL, ARR:
 			fmt.Fprint(&b, op.String()+"\n")
 			i++
 			fmt.Fprintf(&b, "CNT_%d\n", f.Instrs[i])

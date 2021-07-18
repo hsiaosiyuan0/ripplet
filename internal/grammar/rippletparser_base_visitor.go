@@ -24,7 +24,15 @@ func (v *BaseRippletParserVisitor) VisitOkExpr(ctx *OkExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRippletParserVisitor) VisitSubscriptExpr(ctx *SubscriptExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRippletParserVisitor) VisitErrExpr(ctx *ErrExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRippletParserVisitor) VisitLogicExpr(ctx *LogicExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -32,7 +40,7 @@ func (v *BaseRippletParserVisitor) VisitAddExpr(ctx *AddExprContext) interface{}
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseRippletParserVisitor) VisitLogicAndExpr(ctx *LogicAndExprContext) interface{} {
+func (v *BaseRippletParserVisitor) VisitRelationExpr(ctx *RelationExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -48,11 +56,7 @@ func (v *BaseRippletParserVisitor) VisitArrayExpr(ctx *ArrayExprContext) interfa
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseRippletParserVisitor) VisitEqualityIsNotExpr(ctx *EqualityIsNotExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseRippletParserVisitor) VisitMemterIdxExpr(ctx *MemterIdxExprContext) interface{} {
+func (v *BaseRippletParserVisitor) VisitEqualityExpr(ctx *EqualityExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -72,10 +76,6 @@ func (v *BaseRippletParserVisitor) VisitIdentifierExpr(ctx *IdentifierExprContex
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseRippletParserVisitor) VisitLogicOrExpr(ctx *LogicOrExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseRippletParserVisitor) VisitLiteralExpr(ctx *LiteralExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -92,15 +92,19 @@ func (v *BaseRippletParserVisitor) VisitParenExpr(ctx *ParenExprContext) interfa
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseRippletParserVisitor) VisitEqualityIsExpr(ctx *EqualityIsExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseRippletParserVisitor) VisitThisExpr(ctx *ThisExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseRippletParserVisitor) VisitFnExpr(ctx *FnExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRippletParserVisitor) VisitBreakStmt(ctx *BreakStmtContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRippletParserVisitor) VisitReturnStmt(ctx *ReturnStmtContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

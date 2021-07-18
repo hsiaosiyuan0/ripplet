@@ -40,10 +40,14 @@ func (f *FnPlot) ToShape() *FnShape {
 	return s
 }
 
+type RepeatInfo struct {
+	start int
+	brk   int
+}
+
 type CodegenVisitor struct {
 	parser.BaseRippletParserVisitor
 
-	scopeId   uint
 	curFnPlot *FnPlot
 	symtab    *SymTab
 
@@ -51,14 +55,16 @@ type CodegenVisitor struct {
 	inFormalParamList bool
 	inAssignLhs       bool
 
+	repeatStk []*RepeatInfo
+
 	chunk *Chunk
 }
 
 func NewCodegenVisitor(symtab *SymTab) *CodegenVisitor {
 	c := &CodegenVisitor{
-		scopeId:   1,
 		curFnPlot: NewFnPlot(1),
 		symtab:    symtab,
+		repeatStk: make([]*RepeatInfo, 0),
 		chunk:     NewChunk(),
 	}
 	return c
@@ -92,9 +98,273 @@ func (v *CodegenVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitCallExpr(val)
 	case *parser.ArgumentContext:
 		return v.VisitArgument(val)
+	case *parser.AddExprContext:
+		return v.VisitAddExpr(val)
+	case *parser.MulExprContext:
+		return v.VisitMulExpr(val)
+	case *parser.ArrayExprContext:
+		return v.VisitArrayExpr(val)
+	case *parser.SubscriptExprContext:
+		return v.VisitSubscriptExpr(val)
+	case *parser.IfStmtContext:
+		return v.VisitIfStmt(val)
+	case *parser.BlockStmtContext:
+		return v.VisitBlockStmt(val)
+	case *parser.RelationExprContext:
+		return v.VisitRelationExpr(val)
+	case *parser.EqualityExprContext:
+		return v.VisitEqualityExpr(val)
+	case *parser.LogicExprContext:
+		return v.VisitLogicExpr(val)
+	case *parser.ReturnStmtContext:
+		return v.VisitReturnStmt(val)
+	case *parser.RepeatStmtContext:
+		return v.VisitRepeatStmt(val)
+	case *parser.BreakStmtContext:
+		return v.VisitBreakStmt(val)
 	default:
 		panic("visit unsupported context: " + reflect.TypeOf(val).String())
 	}
+}
+
+// 01: OPCODE_X
+// 02: OPCODE_X
+// 03: OPCODE_X
+// 04: TEST
+// 05: JMP_F
+func (v *CodegenVisitor) VisitRepeatStmt(ctx *parser.RepeatStmtContext) interface{} {
+	info := &RepeatInfo{
+		start: len(v.curFnPlot.Shape.Instrs),
+		brk:   -1,
+	}
+	v.repeatStk = append(v.repeatStk, info)
+
+	v.Visit(ctx.Statement())
+	until := ctx.Expression()
+	if until != nil {
+		v.Visit(until)
+		v.emitOpcode(TEST)
+
+		v.emitOpcode(JMP_F)
+		v.emitInt(0)
+		jmpToStartMrk := len(v.curFnPlot.Shape.Instrs)
+
+		v.curFnPlot.Shape.Instrs[jmpToStartMrk-1] = info.start - jmpToStartMrk
+	} else {
+		v.emitOpcode(JMP)
+		v.emitInt(0)
+		jmpToStartMrk := len(v.curFnPlot.Shape.Instrs)
+		v.curFnPlot.Shape.Instrs[jmpToStartMrk-1] = info.start - jmpToStartMrk
+	}
+
+	v.resolveBrk()
+	return nil
+}
+
+// 01: OPCODE_X
+// 02: OPCODE_X
+// 03: JMP  ─────────────────┐
+// 04: OPCODE_X              │
+// 05: TEST                  │
+// 06: JMP_F                 │
+// -------------             │
+// 07: OPCODE_X   ◄──────────┘
+func (v *CodegenVisitor) VisitBreakStmt(ctx *parser.BreakStmtContext) interface{} {
+	if len(v.curFnPlot.Shape.Instrs) == 0 {
+		panic("dangling break")
+	}
+	info := v.repeatStk[len(v.repeatStk)-1]
+	if info.brk != -1 {
+		panic("redundant break")
+	}
+
+	v.emitOpcode(JMP)
+	v.emitInt(0)
+	info.brk = len(v.curFnPlot.Shape.Instrs)
+	return nil
+}
+
+func (v *CodegenVisitor) resolveBrk() {
+	stkLen := len(v.repeatStk)
+	info, repeatStk := v.repeatStk[stkLen-1], v.repeatStk[:stkLen-1]
+
+	v.curFnPlot.Shape.Instrs[info.brk-1] = len(v.curFnPlot.Shape.Instrs) - info.brk
+	v.repeatStk = repeatStk
+}
+
+func (v *CodegenVisitor) VisitReturnStmt(ctx *parser.ReturnStmtContext) interface{} {
+	v.Visit(ctx.Expression())
+	v.emitOpcode(RET)
+	return nil
+}
+
+func (v *CodegenVisitor) VisitEqualityExpr(ctx *parser.EqualityExprContext) interface{} {
+	v.Visit(ctx.Expression(0))
+	v.Visit(ctx.Expression(1))
+
+	if ctx.Is() != nil {
+		v.emitOpcode(IS)
+	} else if ctx.IsNot() != nil {
+		v.emitOpcode(IS_NOT)
+	}
+	return nil
+}
+
+func (v *CodegenVisitor) VisitLogicExpr(ctx *parser.LogicExprContext) interface{} {
+	// more compact opcodes - short-circuit
+	v.Visit(ctx.Expression(0))
+	v.Visit(ctx.Expression(1))
+
+	if ctx.And() != nil {
+		v.emitOpcode(AND)
+	} else if ctx.Or() != nil {
+		v.emitOpcode(OR)
+	}
+	return nil
+}
+
+func (v *CodegenVisitor) VisitRelationExpr(ctx *parser.RelationExprContext) interface{} {
+	v.Visit(ctx.Expression(0))
+	v.Visit(ctx.Expression(1))
+
+	if ctx.GreaterThan() != nil {
+		v.emitOpcode(GT)
+	} else if ctx.GreaterThanEquals() != nil {
+		v.emitOpcode(GE)
+	} else if ctx.LessThan() != nil {
+		v.emitOpcode(LT)
+	} else if ctx.LessThanEquals() != nil {
+		v.emitOpcode(LE)
+	}
+
+	return nil
+}
+
+func (v *CodegenVisitor) VisitBlockStmt(ctx *parser.BlockStmtContext) interface{} {
+	for _, stmt := range ctx.AllStatement() {
+		v.Visit(stmt)
+	}
+	return nil
+}
+
+// 01: TEST
+// 02: JMP_F  ─────────────────┐
+// 03: OFFSET                  │
+// 04: OPCODE_X                │
+// 05: OPCODE_X                │
+// 06: JMP   ──────────────────┼────────┐
+// 07: OFFSET                  │        │
+// 08: OPCODE_X  ◄─────────────┘        │
+// 09: OPCODE_X                         │
+// -------------                        │
+// 10: OPCODE_X  ◄──────────────────────┘
+func (v *CodegenVisitor) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
+	v.Visit(ctx.Expression())
+	v.emitOpcode(TEST)
+
+	v.emitOpcode(JMP_F)
+	// a placeholder to resolve later
+	v.emitInt(0)
+	jmpOverTrueMrk := len(v.curFnPlot.Shape.Instrs)
+
+	// emit true branch
+	v.Visit(ctx.Statement(0))
+	v.emitOpcode(JMP)
+	v.emitInt(0)
+	jmpOverFalseMrk := len(v.curFnPlot.Shape.Instrs)
+
+	// resolve offset1
+	v.curFnPlot.Shape.Instrs[jmpOverTrueMrk-1] = jmpOverFalseMrk - jmpOverTrueMrk
+
+	// emit false branch
+	elseBranch := ctx.Statement(1)
+	if elseBranch != nil {
+		v.Visit(elseBranch)
+
+		// resolve offset2
+		afterElseInstrLen := len(v.curFnPlot.Shape.Instrs)
+		v.curFnPlot.Shape.Instrs[jmpOverFalseMrk-1] = afterElseInstrLen - jmpOverFalseMrk
+	}
+
+	return nil
+}
+
+func (v *CodegenVisitor) VisitSubscriptExpr(ctx *parser.SubscriptExprContext) interface{} {
+	v.Visit(ctx.Expression(0))
+	v.Visit(ctx.Expression(1))
+	v.emitOpcode(SUBSCRIPT)
+	return nil
+}
+
+func (v *CodegenVisitor) VisitArrayLiteral(ctx *parser.ArrayLiteralContext) interface{} {
+	exprs := ctx.AllExpression()
+	for _, expr := range exprs {
+		v.Visit(expr)
+	}
+	v.emitOpcode(ARR)
+	v.emitInt(len(exprs))
+	return nil
+}
+
+func (v *CodegenVisitor) VisitArrayExpr(ctx *parser.ArrayExprContext) interface{} {
+	v.VisitArrayLiteral(ctx.ArrayLiteral().(*parser.ArrayLiteralContext))
+	return nil
+}
+
+func (v *CodegenVisitor) VisitMulExpr(ctx *parser.MulExprContext) interface{} {
+	v.Visit(ctx.Expression(0))
+	v.Visit(ctx.Expression(1))
+
+	if ctx.Multiply() != nil {
+		v.emitOpcode(MUL)
+	} else if ctx.Divide() != nil {
+		v.emitOpcode(DIV)
+	} else if ctx.Modulus() != nil {
+		v.emitOpcode(MOD)
+	}
+	return nil
+}
+
+func (v *CodegenVisitor) VisitAddExpr(ctx *parser.AddExprContext) interface{} {
+	v.Visit(ctx.Expression(0))
+	v.Visit(ctx.Expression(1))
+
+	if ctx.Plus() != nil {
+		v.emitOpcode(ADD)
+	} else if ctx.Minus() != nil {
+		v.emitOpcode(SUB)
+	}
+	return nil
+}
+
+// ensure the upval is in the upval-chain otherwise propagate up through FnPlots
+// to setup the upval
+func (v *CodegenVisitor) resolveUpChain(fn *FnPlot, name string) {
+	if fn == nil {
+		return
+	}
+
+	shape := fn.Shape
+	if _, ok := shape.Upvals[name]; ok {
+		return
+	}
+
+	var loc UpLoc
+	scope := v.symtab.Scopes[fn.Scope]
+	if pi := scope.ParentLocalIdx(name); pi != -1 {
+		loc = UpLoc{
+			Typ: UP_LOC_LOCAL,
+			At:  pi,
+		}
+	} else {
+		loc = UpLoc{
+			Typ: UP_LOC_UP,
+			At:  name,
+		}
+	}
+	shape.Upvals[name] = loc
+
+	v.resolveUpChain(fn.Parent, name)
 }
 
 func (v *CodegenVisitor) VisitIdentifierExpr(ctx *parser.IdentifierExprContext) interface{} {
@@ -103,6 +373,8 @@ func (v *CodegenVisitor) VisitIdentifierExpr(ctx *parser.IdentifierExprContext) 
 		v.emitOpcode(LOAD)
 		v.emitInt(v.curSymtab().LocalIdx(name))
 	} else if v.curSymtab().HasBinding(name) {
+		v.resolveUpChain(v.curFnPlot, name)
+
 		v.emitOpcode(LOAD_UP)
 		v.emitString(name)
 	} else if v.symtab.HasExternal(name) {
@@ -129,7 +401,7 @@ func (v *CodegenVisitor) VisitFormalParams(ctx *parser.FormalParamsContext) inte
 }
 
 func (v *CodegenVisitor) enterFn() {
-	fn := NewFnPlot(v.scopeId + 1)
+	fn := NewFnPlot(v.curFnPlot.Scope + 1)
 	fn.IdxInParent = len(v.curFnPlot.Subs)
 	v.curFnPlot.Subs = append(v.curFnPlot.Subs, fn)
 	fn.Parent = v.curFnPlot
@@ -137,6 +409,8 @@ func (v *CodegenVisitor) enterFn() {
 }
 
 func (v *CodegenVisitor) exitFn() {
+	v.emitOpcode(RET)
+
 	v.curFnPlot.Shape.LocalCnt = v.curSymtab().LocalCnt()
 	v.curFnPlot = v.curFnPlot.Parent
 }
@@ -242,7 +516,15 @@ func (v *CodegenVisitor) VisitIdentifer(ctx *parser.IdentiferContext) interface{
 	if v.inAssignLhs {
 		v.emitOpcode(STORE_UP)
 		v.emitString(name)
+		return nil
 	}
+
+	if v.inFormalParamList {
+		// TODO: varargs
+		v.emitOpcode(LOAD_ARG)
+		v.emitInt(v.curSymtab().LocalIdx(name))
+	}
+
 	return nil
 }
 

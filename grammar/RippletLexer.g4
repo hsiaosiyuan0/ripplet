@@ -51,7 +51,7 @@ Modulus: '%';
 Declare: ':=';
 Assign: '=';
 LessThan: '<';
-MoreThan: '>';
+GreaterThan: '>';
 Equals: '==';
 NotEquals: '!=';
 LessThanEquals: '<=';

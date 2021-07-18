@@ -20,14 +20,20 @@ type RippletParserVisitor interface {
 	// Visit a parse tree produced by RippletParser#OkExpr.
 	VisitOkExpr(ctx *OkExprContext) interface{}
 
+	// Visit a parse tree produced by RippletParser#SubscriptExpr.
+	VisitSubscriptExpr(ctx *SubscriptExprContext) interface{}
+
 	// Visit a parse tree produced by RippletParser#ErrExpr.
 	VisitErrExpr(ctx *ErrExprContext) interface{}
+
+	// Visit a parse tree produced by RippletParser#LogicExpr.
+	VisitLogicExpr(ctx *LogicExprContext) interface{}
 
 	// Visit a parse tree produced by RippletParser#AddExpr.
 	VisitAddExpr(ctx *AddExprContext) interface{}
 
-	// Visit a parse tree produced by RippletParser#LogicAndExpr.
-	VisitLogicAndExpr(ctx *LogicAndExprContext) interface{}
+	// Visit a parse tree produced by RippletParser#RelationExpr.
+	VisitRelationExpr(ctx *RelationExprContext) interface{}
 
 	// Visit a parse tree produced by RippletParser#VoidExpr.
 	VisitVoidExpr(ctx *VoidExprContext) interface{}
@@ -38,11 +44,8 @@ type RippletParserVisitor interface {
 	// Visit a parse tree produced by RippletParser#ArrayExpr.
 	VisitArrayExpr(ctx *ArrayExprContext) interface{}
 
-	// Visit a parse tree produced by RippletParser#EqualityIsNotExpr.
-	VisitEqualityIsNotExpr(ctx *EqualityIsNotExprContext) interface{}
-
-	// Visit a parse tree produced by RippletParser#MemterIdxExpr.
-	VisitMemterIdxExpr(ctx *MemterIdxExprContext) interface{}
+	// Visit a parse tree produced by RippletParser#EqualityExpr.
+	VisitEqualityExpr(ctx *EqualityExprContext) interface{}
 
 	// Visit a parse tree produced by RippletParser#MemberDotExpr.
 	VisitMemberDotExpr(ctx *MemberDotExprContext) interface{}
@@ -56,9 +59,6 @@ type RippletParserVisitor interface {
 	// Visit a parse tree produced by RippletParser#IdentifierExpr.
 	VisitIdentifierExpr(ctx *IdentifierExprContext) interface{}
 
-	// Visit a parse tree produced by RippletParser#LogicOrExpr.
-	VisitLogicOrExpr(ctx *LogicOrExprContext) interface{}
-
 	// Visit a parse tree produced by RippletParser#LiteralExpr.
 	VisitLiteralExpr(ctx *LiteralExprContext) interface{}
 
@@ -71,14 +71,17 @@ type RippletParserVisitor interface {
 	// Visit a parse tree produced by RippletParser#ParenExpr.
 	VisitParenExpr(ctx *ParenExprContext) interface{}
 
-	// Visit a parse tree produced by RippletParser#EqualityIsExpr.
-	VisitEqualityIsExpr(ctx *EqualityIsExprContext) interface{}
-
 	// Visit a parse tree produced by RippletParser#ThisExpr.
 	VisitThisExpr(ctx *ThisExprContext) interface{}
 
 	// Visit a parse tree produced by RippletParser#FnExpr.
 	VisitFnExpr(ctx *FnExprContext) interface{}
+
+	// Visit a parse tree produced by RippletParser#breakStmt.
+	VisitBreakStmt(ctx *BreakStmtContext) interface{}
+
+	// Visit a parse tree produced by RippletParser#returnStmt.
+	VisitReturnStmt(ctx *ReturnStmtContext) interface{}
 
 	// Visit a parse tree produced by RippletParser#objDeclareStmt.
 	VisitObjDeclareStmt(ctx *ObjDeclareStmtContext) interface{}

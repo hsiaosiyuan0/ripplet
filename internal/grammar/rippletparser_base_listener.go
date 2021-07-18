@@ -45,11 +45,23 @@ func (s *BaseRippletParserListener) EnterOkExpr(ctx *OkExprContext) {}
 // ExitOkExpr is called when production OkExpr is exited.
 func (s *BaseRippletParserListener) ExitOkExpr(ctx *OkExprContext) {}
 
+// EnterSubscriptExpr is called when production SubscriptExpr is entered.
+func (s *BaseRippletParserListener) EnterSubscriptExpr(ctx *SubscriptExprContext) {}
+
+// ExitSubscriptExpr is called when production SubscriptExpr is exited.
+func (s *BaseRippletParserListener) ExitSubscriptExpr(ctx *SubscriptExprContext) {}
+
 // EnterErrExpr is called when production ErrExpr is entered.
 func (s *BaseRippletParserListener) EnterErrExpr(ctx *ErrExprContext) {}
 
 // ExitErrExpr is called when production ErrExpr is exited.
 func (s *BaseRippletParserListener) ExitErrExpr(ctx *ErrExprContext) {}
+
+// EnterLogicExpr is called when production LogicExpr is entered.
+func (s *BaseRippletParserListener) EnterLogicExpr(ctx *LogicExprContext) {}
+
+// ExitLogicExpr is called when production LogicExpr is exited.
+func (s *BaseRippletParserListener) ExitLogicExpr(ctx *LogicExprContext) {}
 
 // EnterAddExpr is called when production AddExpr is entered.
 func (s *BaseRippletParserListener) EnterAddExpr(ctx *AddExprContext) {}
@@ -57,11 +69,11 @@ func (s *BaseRippletParserListener) EnterAddExpr(ctx *AddExprContext) {}
 // ExitAddExpr is called when production AddExpr is exited.
 func (s *BaseRippletParserListener) ExitAddExpr(ctx *AddExprContext) {}
 
-// EnterLogicAndExpr is called when production LogicAndExpr is entered.
-func (s *BaseRippletParserListener) EnterLogicAndExpr(ctx *LogicAndExprContext) {}
+// EnterRelationExpr is called when production RelationExpr is entered.
+func (s *BaseRippletParserListener) EnterRelationExpr(ctx *RelationExprContext) {}
 
-// ExitLogicAndExpr is called when production LogicAndExpr is exited.
-func (s *BaseRippletParserListener) ExitLogicAndExpr(ctx *LogicAndExprContext) {}
+// ExitRelationExpr is called when production RelationExpr is exited.
+func (s *BaseRippletParserListener) ExitRelationExpr(ctx *RelationExprContext) {}
 
 // EnterVoidExpr is called when production VoidExpr is entered.
 func (s *BaseRippletParserListener) EnterVoidExpr(ctx *VoidExprContext) {}
@@ -81,17 +93,11 @@ func (s *BaseRippletParserListener) EnterArrayExpr(ctx *ArrayExprContext) {}
 // ExitArrayExpr is called when production ArrayExpr is exited.
 func (s *BaseRippletParserListener) ExitArrayExpr(ctx *ArrayExprContext) {}
 
-// EnterEqualityIsNotExpr is called when production EqualityIsNotExpr is entered.
-func (s *BaseRippletParserListener) EnterEqualityIsNotExpr(ctx *EqualityIsNotExprContext) {}
+// EnterEqualityExpr is called when production EqualityExpr is entered.
+func (s *BaseRippletParserListener) EnterEqualityExpr(ctx *EqualityExprContext) {}
 
-// ExitEqualityIsNotExpr is called when production EqualityIsNotExpr is exited.
-func (s *BaseRippletParserListener) ExitEqualityIsNotExpr(ctx *EqualityIsNotExprContext) {}
-
-// EnterMemterIdxExpr is called when production MemterIdxExpr is entered.
-func (s *BaseRippletParserListener) EnterMemterIdxExpr(ctx *MemterIdxExprContext) {}
-
-// ExitMemterIdxExpr is called when production MemterIdxExpr is exited.
-func (s *BaseRippletParserListener) ExitMemterIdxExpr(ctx *MemterIdxExprContext) {}
+// ExitEqualityExpr is called when production EqualityExpr is exited.
+func (s *BaseRippletParserListener) ExitEqualityExpr(ctx *EqualityExprContext) {}
 
 // EnterMemberDotExpr is called when production MemberDotExpr is entered.
 func (s *BaseRippletParserListener) EnterMemberDotExpr(ctx *MemberDotExprContext) {}
@@ -117,12 +123,6 @@ func (s *BaseRippletParserListener) EnterIdentifierExpr(ctx *IdentifierExprConte
 // ExitIdentifierExpr is called when production IdentifierExpr is exited.
 func (s *BaseRippletParserListener) ExitIdentifierExpr(ctx *IdentifierExprContext) {}
 
-// EnterLogicOrExpr is called when production LogicOrExpr is entered.
-func (s *BaseRippletParserListener) EnterLogicOrExpr(ctx *LogicOrExprContext) {}
-
-// ExitLogicOrExpr is called when production LogicOrExpr is exited.
-func (s *BaseRippletParserListener) ExitLogicOrExpr(ctx *LogicOrExprContext) {}
-
 // EnterLiteralExpr is called when production LiteralExpr is entered.
 func (s *BaseRippletParserListener) EnterLiteralExpr(ctx *LiteralExprContext) {}
 
@@ -147,12 +147,6 @@ func (s *BaseRippletParserListener) EnterParenExpr(ctx *ParenExprContext) {}
 // ExitParenExpr is called when production ParenExpr is exited.
 func (s *BaseRippletParserListener) ExitParenExpr(ctx *ParenExprContext) {}
 
-// EnterEqualityIsExpr is called when production EqualityIsExpr is entered.
-func (s *BaseRippletParserListener) EnterEqualityIsExpr(ctx *EqualityIsExprContext) {}
-
-// ExitEqualityIsExpr is called when production EqualityIsExpr is exited.
-func (s *BaseRippletParserListener) ExitEqualityIsExpr(ctx *EqualityIsExprContext) {}
-
 // EnterThisExpr is called when production ThisExpr is entered.
 func (s *BaseRippletParserListener) EnterThisExpr(ctx *ThisExprContext) {}
 
@@ -164,6 +158,18 @@ func (s *BaseRippletParserListener) EnterFnExpr(ctx *FnExprContext) {}
 
 // ExitFnExpr is called when production FnExpr is exited.
 func (s *BaseRippletParserListener) ExitFnExpr(ctx *FnExprContext) {}
+
+// EnterBreakStmt is called when production breakStmt is entered.
+func (s *BaseRippletParserListener) EnterBreakStmt(ctx *BreakStmtContext) {}
+
+// ExitBreakStmt is called when production breakStmt is exited.
+func (s *BaseRippletParserListener) ExitBreakStmt(ctx *BreakStmtContext) {}
+
+// EnterReturnStmt is called when production returnStmt is entered.
+func (s *BaseRippletParserListener) EnterReturnStmt(ctx *ReturnStmtContext) {}
+
+// ExitReturnStmt is called when production returnStmt is exited.
+func (s *BaseRippletParserListener) ExitReturnStmt(ctx *ReturnStmtContext) {}
 
 // EnterObjDeclareStmt is called when production objDeclareStmt is entered.
 func (s *BaseRippletParserListener) EnterObjDeclareStmt(ctx *ObjDeclareStmtContext) {}

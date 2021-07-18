@@ -48,6 +48,10 @@ func (s *Scope) HasLocal(name string) bool {
 	return ok
 }
 
+func (s *Scope) ParentLocalIdx(name string) int {
+	return s.Parent.LocalIdx(name)
+}
+
 func (s *Scope) HasBinding(name string) bool {
 	scope := s
 	for scope != nil {

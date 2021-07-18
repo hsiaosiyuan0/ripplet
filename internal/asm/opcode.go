@@ -1,5 +1,7 @@
 package asm
 
+import "fmt"
+
 // TODO: reduce op size to byte to get a better
 // memory footprint
 type Opcode int
@@ -12,9 +14,29 @@ const (
 	STORE_UP
 	LOAD_EXT
 	CLOSURE
+	LOAD_ARG
 	ADD
+	SUB
+	MUL
+	DIV
+	MOD
+	ARR
+	SUBSCRIPT
 	CONCAT
 	CALL
+	RET
+	NOT
+	TEST
+	JMP_F
+	JMP
+	IS
+	IS_NOT
+	GT
+	LT
+	GE
+	LE
+	OR
+	AND
 )
 
 func (op Opcode) String() string {
@@ -25,8 +47,6 @@ func (op Opcode) String() string {
 		return "LOAD"
 	case STORE:
 		return "STORE"
-	case ADD:
-		return "ADD"
 	case CALL:
 		return "CALL"
 	case CLOSURE:
@@ -39,7 +59,45 @@ func (op Opcode) String() string {
 		return "STORE_UP"
 	case LOAD_EXT:
 		return "LOAD_EXT"
+	case LOAD_ARG:
+		return "LOAD_ARG"
+	case RET:
+		return "RET"
+	case ADD:
+		return "ADD"
+	case SUB:
+		return "SUB"
+	case MUL:
+		return "MUL"
+	case DIV:
+		return "DIV"
+	case ARR:
+		return "ARR"
+	case SUBSCRIPT:
+		return "SUBSCRIPT"
+	case TEST:
+		return "TEST"
+	case JMP_F:
+		return "JMP_F"
+	case JMP:
+		return "JMP"
+	case IS:
+		return "IS"
+	case IS_NOT:
+		return "IS_NOT"
+	case GT:
+		return "GT"
+	case GE:
+		return "GE"
+	case LT:
+		return "LT"
+	case LE:
+		return "LE"
+	case OR:
+		return "OR"
+	case AND:
+		return "AND"
 	default:
-		panic("unreachable")
+		panic(fmt.Errorf("unreachable: %d", op))
 	}
 }

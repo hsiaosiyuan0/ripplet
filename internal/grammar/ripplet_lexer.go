@@ -511,7 +511,7 @@ var lexerSymbolicNames = []string{
 	"This", "LineTerminator", "Whitespace", "Comment", "RegexpStart", "BraceOpen",
 	"BraceClose", "BracketOpen", "BracketClose", "ParenOpen", "ParenClose",
 	"Comma", "Colon", "SemiColon", "Dot", "Plus", "Minus", "Power", "Multiply",
-	"Divide", "Modulus", "Declare", "Assign", "LessThan", "MoreThan", "Equals",
+	"Divide", "Modulus", "Declare", "Assign", "LessThan", "GreaterThan", "Equals",
 	"NotEquals", "LessThanEquals", "GreaterThanEquals", "LambdaConnect", "Ellipsis",
 	"Discard", "NilLiteral", "BooLiteral", "IntLiteral", "HexLiteral", "RealLiteral",
 	"Identifier", "StringOpen", "RegexpComment", "RegexpNewline", "RegexpContent",
@@ -524,7 +524,7 @@ var lexerRuleNames = []string{
 	"This", "LineTerminator", "Whitespace", "Comment", "RegexpStart", "BraceOpen",
 	"BraceClose", "BracketOpen", "BracketClose", "ParenOpen", "ParenClose",
 	"Comma", "Colon", "SemiColon", "Dot", "Plus", "Minus", "Power", "Multiply",
-	"Divide", "Modulus", "Declare", "Assign", "LessThan", "MoreThan", "Equals",
+	"Divide", "Modulus", "Declare", "Assign", "LessThan", "GreaterThan", "Equals",
 	"NotEquals", "LessThanEquals", "GreaterThanEquals", "LambdaConnect", "Ellipsis",
 	"Discard", "NilLiteral", "BooLiteral", "IntLiteral", "HexLiteral", "RealLiteral",
 	"Identifier", "StringOpen", "RegexpComment", "RegexpNewline", "RegexpContent",
@@ -613,7 +613,7 @@ const (
 	RippletLexerDeclare           = 40
 	RippletLexerAssign            = 41
 	RippletLexerLessThan          = 42
-	RippletLexerMoreThan          = 43
+	RippletLexerGreaterThan       = 43
 	RippletLexerEquals            = 44
 	RippletLexerNotEquals         = 45
 	RippletLexerLessThanEquals    = 46

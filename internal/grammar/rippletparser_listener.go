@@ -20,14 +20,20 @@ type RippletParserListener interface {
 	// EnterOkExpr is called when entering the OkExpr production.
 	EnterOkExpr(c *OkExprContext)
 
+	// EnterSubscriptExpr is called when entering the SubscriptExpr production.
+	EnterSubscriptExpr(c *SubscriptExprContext)
+
 	// EnterErrExpr is called when entering the ErrExpr production.
 	EnterErrExpr(c *ErrExprContext)
+
+	// EnterLogicExpr is called when entering the LogicExpr production.
+	EnterLogicExpr(c *LogicExprContext)
 
 	// EnterAddExpr is called when entering the AddExpr production.
 	EnterAddExpr(c *AddExprContext)
 
-	// EnterLogicAndExpr is called when entering the LogicAndExpr production.
-	EnterLogicAndExpr(c *LogicAndExprContext)
+	// EnterRelationExpr is called when entering the RelationExpr production.
+	EnterRelationExpr(c *RelationExprContext)
 
 	// EnterVoidExpr is called when entering the VoidExpr production.
 	EnterVoidExpr(c *VoidExprContext)
@@ -38,11 +44,8 @@ type RippletParserListener interface {
 	// EnterArrayExpr is called when entering the ArrayExpr production.
 	EnterArrayExpr(c *ArrayExprContext)
 
-	// EnterEqualityIsNotExpr is called when entering the EqualityIsNotExpr production.
-	EnterEqualityIsNotExpr(c *EqualityIsNotExprContext)
-
-	// EnterMemterIdxExpr is called when entering the MemterIdxExpr production.
-	EnterMemterIdxExpr(c *MemterIdxExprContext)
+	// EnterEqualityExpr is called when entering the EqualityExpr production.
+	EnterEqualityExpr(c *EqualityExprContext)
 
 	// EnterMemberDotExpr is called when entering the MemberDotExpr production.
 	EnterMemberDotExpr(c *MemberDotExprContext)
@@ -56,9 +59,6 @@ type RippletParserListener interface {
 	// EnterIdentifierExpr is called when entering the IdentifierExpr production.
 	EnterIdentifierExpr(c *IdentifierExprContext)
 
-	// EnterLogicOrExpr is called when entering the LogicOrExpr production.
-	EnterLogicOrExpr(c *LogicOrExprContext)
-
 	// EnterLiteralExpr is called when entering the LiteralExpr production.
 	EnterLiteralExpr(c *LiteralExprContext)
 
@@ -71,14 +71,17 @@ type RippletParserListener interface {
 	// EnterParenExpr is called when entering the ParenExpr production.
 	EnterParenExpr(c *ParenExprContext)
 
-	// EnterEqualityIsExpr is called when entering the EqualityIsExpr production.
-	EnterEqualityIsExpr(c *EqualityIsExprContext)
-
 	// EnterThisExpr is called when entering the ThisExpr production.
 	EnterThisExpr(c *ThisExprContext)
 
 	// EnterFnExpr is called when entering the FnExpr production.
 	EnterFnExpr(c *FnExprContext)
+
+	// EnterBreakStmt is called when entering the breakStmt production.
+	EnterBreakStmt(c *BreakStmtContext)
+
+	// EnterReturnStmt is called when entering the returnStmt production.
+	EnterReturnStmt(c *ReturnStmtContext)
 
 	// EnterObjDeclareStmt is called when entering the objDeclareStmt production.
 	EnterObjDeclareStmt(c *ObjDeclareStmtContext)
@@ -236,14 +239,20 @@ type RippletParserListener interface {
 	// ExitOkExpr is called when exiting the OkExpr production.
 	ExitOkExpr(c *OkExprContext)
 
+	// ExitSubscriptExpr is called when exiting the SubscriptExpr production.
+	ExitSubscriptExpr(c *SubscriptExprContext)
+
 	// ExitErrExpr is called when exiting the ErrExpr production.
 	ExitErrExpr(c *ErrExprContext)
+
+	// ExitLogicExpr is called when exiting the LogicExpr production.
+	ExitLogicExpr(c *LogicExprContext)
 
 	// ExitAddExpr is called when exiting the AddExpr production.
 	ExitAddExpr(c *AddExprContext)
 
-	// ExitLogicAndExpr is called when exiting the LogicAndExpr production.
-	ExitLogicAndExpr(c *LogicAndExprContext)
+	// ExitRelationExpr is called when exiting the RelationExpr production.
+	ExitRelationExpr(c *RelationExprContext)
 
 	// ExitVoidExpr is called when exiting the VoidExpr production.
 	ExitVoidExpr(c *VoidExprContext)
@@ -254,11 +263,8 @@ type RippletParserListener interface {
 	// ExitArrayExpr is called when exiting the ArrayExpr production.
 	ExitArrayExpr(c *ArrayExprContext)
 
-	// ExitEqualityIsNotExpr is called when exiting the EqualityIsNotExpr production.
-	ExitEqualityIsNotExpr(c *EqualityIsNotExprContext)
-
-	// ExitMemterIdxExpr is called when exiting the MemterIdxExpr production.
-	ExitMemterIdxExpr(c *MemterIdxExprContext)
+	// ExitEqualityExpr is called when exiting the EqualityExpr production.
+	ExitEqualityExpr(c *EqualityExprContext)
 
 	// ExitMemberDotExpr is called when exiting the MemberDotExpr production.
 	ExitMemberDotExpr(c *MemberDotExprContext)
@@ -272,9 +278,6 @@ type RippletParserListener interface {
 	// ExitIdentifierExpr is called when exiting the IdentifierExpr production.
 	ExitIdentifierExpr(c *IdentifierExprContext)
 
-	// ExitLogicOrExpr is called when exiting the LogicOrExpr production.
-	ExitLogicOrExpr(c *LogicOrExprContext)
-
 	// ExitLiteralExpr is called when exiting the LiteralExpr production.
 	ExitLiteralExpr(c *LiteralExprContext)
 
@@ -287,14 +290,17 @@ type RippletParserListener interface {
 	// ExitParenExpr is called when exiting the ParenExpr production.
 	ExitParenExpr(c *ParenExprContext)
 
-	// ExitEqualityIsExpr is called when exiting the EqualityIsExpr production.
-	ExitEqualityIsExpr(c *EqualityIsExprContext)
-
 	// ExitThisExpr is called when exiting the ThisExpr production.
 	ExitThisExpr(c *ThisExprContext)
 
 	// ExitFnExpr is called when exiting the FnExpr production.
 	ExitFnExpr(c *FnExprContext)
+
+	// ExitBreakStmt is called when exiting the breakStmt production.
+	ExitBreakStmt(c *BreakStmtContext)
+
+	// ExitReturnStmt is called when exiting the returnStmt production.
+	ExitReturnStmt(c *ReturnStmtContext)
 
 	// ExitObjDeclareStmt is called when exiting the objDeclareStmt production.
 	ExitObjDeclareStmt(c *ObjDeclareStmtContext)

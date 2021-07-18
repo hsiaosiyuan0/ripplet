@@ -109,7 +109,7 @@ Modulus
 Declare
 Assign
 LessThan
-MoreThan
+GreaterThan
 Equals
 NotEquals
 LessThanEquals
@@ -175,7 +175,7 @@ Modulus
 Declare
 Assign
 LessThan
-MoreThan
+GreaterThan
 Equals
 NotEquals
 LessThanEquals

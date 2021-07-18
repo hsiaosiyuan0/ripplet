@@ -10,28 +10,29 @@ statement:
   exprStmt
   | ifStmt
   | repeatStmt
+	| breakStmt
   | matchStmt
   | assignStmt
   | varDeclareStmt
   | objDeclareStmt
   | fnDeclareStmt
   | blockStmt
+	| returnStmt
   ;
 
 expression:
-  expression '[' expression ']'                         # MemterIdxExpr
+  expression '[' expression ']'                         # SubscriptExpr
   | expression Dot Identifier                           # MemberDotExpr
   | Typeof expression                                   # TypeofExpr
-  | expression Is expression                            # EqualityIsExpr
-  | expression IsNot expression                         # EqualityIsNotExpr
   | Not expression                                      # NotExpr
-  | expression arguments                                 # CallExpr
+  | expression arguments                                # CallExpr
   | formalParams LambdaConnect fnBody                   # FnExpr
   | <assoc=right> expression '**' expression            # PowerExpr
   | expression ('*' | Divide | '%') expression          # MulExpr
   | expression ('+' | '-') expression                   # AddExpr
-  | expression And expression                           # LogicAndExpr
-  | expression Or expression                            # LogicOrExpr
+	| expression ('>' | '<' | '>=' | '<=')  expression    # RelationExpr
+	| expression (Is | IsNot) expression                  # EqualityExpr
+  | expression (And | Or) expression                    # LogicExpr
 	| Ok expression                                       # OkExpr
 	| Err expression                                      # ErrExpr
 	| This																								# ThisExpr
@@ -42,6 +43,10 @@ expression:
   | '(' expression ')'                                  # ParenExpr
   | '(' ')'                                             # VoidExpr
   ;
+
+breakStmt: 'break';
+
+returnStmt: 'return' expression;
 
 objDeclareStmt: Object '{' objProps? objMethods?  '}';
 
@@ -96,9 +101,9 @@ restParamArg: Ellipsis identifer;
 
 blockStmt: '{' statement* '}';
 
-ifStmt: 'if' expression Then? statement (Else statement)?;
+ifStmt: 'if' expression Then statement (Else statement)?;
 
-repeatStmt: Repeat statement Until expression;
+repeatStmt: Repeat statement (Until expression)?;
 
 arguments: '(' (argument (',' argument)* ','?)? ')';
 

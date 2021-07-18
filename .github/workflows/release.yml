@@ -10,6 +10,7 @@ jobs:
       uses: ngs/go-release.action@master
       env:
         CMD_PATH: "./cmd/ripplet"
+        PROJECT_NAME: "ripplet"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GOARCH: amd64
         GOOS: linux
@@ -23,6 +24,7 @@ jobs:
       uses: ngs/go-release.action@master
       env:
         CMD_PATH: "./cmd/ripplet"
+        PROJECT_NAME: "ripplet"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GOARCH: amd64
         GOOS: darwin
@@ -36,6 +38,7 @@ jobs:
       uses: ngs/go-release.action@master
       env:
         CMD_PATH: "./cmd/ripplet"
+        PROJECT_NAME: "ripplet"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GOARCH: amd64
         GOOS: windows

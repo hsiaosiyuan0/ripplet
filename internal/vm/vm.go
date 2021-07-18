@@ -161,6 +161,37 @@ func (o *Object) LE(rhs *Object) *Object {
 	return falseObj
 }
 
+func (o *Object) EQ(rhs *Object) *Object {
+	if o.Typ != rhs.Typ {
+		return falseObj
+	}
+	switch o.Typ {
+	case STR:
+		op1 := o.Data.(string)
+		op2 := rhs.Data.(string)
+		cmp := strings.Compare(op1, op2)
+		if cmp == 0 {
+			return tureObj
+		}
+
+	case NUM:
+		op1 := o.Data.(float64)
+		op2 := rhs.Data.(float64)
+		if op1 == op2 {
+			return tureObj
+		}
+
+	case BOOL:
+		op1 := o.Data.(bool)
+		op2 := rhs.Data.(bool)
+		if op1 == op2 {
+			return tureObj
+		}
+	}
+
+	return falseObj
+}
+
 type Fn struct {
 }
 
@@ -497,6 +528,17 @@ func (v *Vm) dispatch(op asm.Opcode) {
 		} else {
 			v.pushOperand(falseObj)
 		}
+
+	case asm.NEG:
+		op := v.popOperand()
+		op.Data = -op.Data.(float64)
+		v.pushOperand(op)
+
+	case asm.BOOL_T:
+		v.pushOperand(tureObj)
+
+	case asm.BOOL_F:
+		v.pushOperand(falseObj)
 
 	default:
 		fmt.Printf("%s\n", op.String())

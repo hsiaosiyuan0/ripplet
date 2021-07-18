@@ -87,6 +87,12 @@ func (s *BaseRippletParserListener) EnterPowerExpr(ctx *PowerExprContext) {}
 // ExitPowerExpr is called when production PowerExpr is exited.
 func (s *BaseRippletParserListener) ExitPowerExpr(ctx *PowerExprContext) {}
 
+// EnterNegativeExpr is called when production NegativeExpr is entered.
+func (s *BaseRippletParserListener) EnterNegativeExpr(ctx *NegativeExprContext) {}
+
+// ExitNegativeExpr is called when production NegativeExpr is exited.
+func (s *BaseRippletParserListener) ExitNegativeExpr(ctx *NegativeExprContext) {}
+
 // EnterArrayExpr is called when production ArrayExpr is entered.
 func (s *BaseRippletParserListener) EnterArrayExpr(ctx *ArrayExprContext) {}
 

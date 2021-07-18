@@ -52,6 +52,10 @@ func (v *BaseRippletParserVisitor) VisitPowerExpr(ctx *PowerExprContext) interfa
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRippletParserVisitor) VisitNegativeExpr(ctx *NegativeExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRippletParserVisitor) VisitArrayExpr(ctx *ArrayExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }

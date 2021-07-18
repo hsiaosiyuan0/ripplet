@@ -8,12 +8,11 @@ import (
 
 func main() {
 	code := `
-a := 1
-repeat {
-	a = a + 1
-  if a > 10 then break
-}
-print(a)
+  a := 1
+  repeat {
+    a = a + 1
+  } until a > 10
+  print(a, 11)
 	`
 
 	print := &vm.GoFn{
@@ -34,5 +33,5 @@ print(a)
 	vm.SetCode(code)
 	fmt.Println(vm.GetChunk().Fn.Dump(vm.GetChunk()))
 
-	vm.Exec()
+	// vm.Exec()
 }

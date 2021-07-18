@@ -122,9 +122,17 @@ func (v *CodegenVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitRepeatStmt(val)
 	case *parser.BreakStmtContext:
 		return v.VisitBreakStmt(val)
+	case *parser.NegativeExprContext:
+		return v.VisitNegativeExpr(val)
 	default:
 		panic("visit unsupported context: " + reflect.TypeOf(val).String())
 	}
+}
+
+func (v *CodegenVisitor) VisitNegativeExpr(ctx *parser.NegativeExprContext) interface{} {
+	v.Visit(ctx.Expression())
+	v.emitOpcode(NEG)
+	return nil
 }
 
 // 01: OPCODE_X
@@ -188,7 +196,9 @@ func (v *CodegenVisitor) resolveBrk() {
 	stkLen := len(v.repeatStk)
 	info, repeatStk := v.repeatStk[stkLen-1], v.repeatStk[:stkLen-1]
 
-	v.curFnPlot.Shape.Instrs[info.brk-1] = len(v.curFnPlot.Shape.Instrs) - info.brk
+	if info.brk != -1 {
+		v.curFnPlot.Shape.Instrs[info.brk-1] = len(v.curFnPlot.Shape.Instrs) - info.brk
+	}
 	v.repeatStk = repeatStk
 }
 
@@ -443,6 +453,10 @@ func (v *CodegenVisitor) VisitNumberLiteral(ctx *parser.NumberLiteralContext) in
 	if ctx.HexLiteral() != nil {
 		v.VisitHexLiteral(ctx.HexLiteral().(*parser.HexLiteralContext))
 	}
+
+	if ctx.RealLiteral() != nil {
+		v.VisitRealLiteral(ctx.RealLiteral().(*parser.RealLiteralContext))
+	}
 	return nil
 }
 
@@ -475,6 +489,20 @@ func (v *CodegenVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 
 	if ctx.StringLiteral() != nil {
 		return v.VisitStringLiteral(ctx.StringLiteral().(*parser.StringLiteralContext))
+	}
+
+	if ctx.BoolLiteral() != nil {
+		return v.VisitBoolLiteral(ctx.BoolLiteral().(*parser.BoolLiteralContext))
+	}
+	return nil
+}
+
+func (v *CodegenVisitor) VisitBoolLiteral(ctx *parser.BoolLiteralContext) interface{} {
+	raw := ctx.GetText()
+	if raw == "true" {
+		v.emitOpcode(BOOL_T)
+	} else if raw == "false" {
+		v.emitOpcode(BOOL_F)
 	}
 	return nil
 }
@@ -600,7 +628,10 @@ func (v *CodegenVisitor) VisitRealLiteral(ctx *parser.RealLiteralContext) interf
 	if err != nil {
 		panic(err)
 	}
-	v.chunk.AddConstNum(i)
+
+	ci := v.chunk.AddConstNum(float64(i))
+	v.emitOpcode(CONST)
+	v.emitInt(ci)
 	return nil
 }
 

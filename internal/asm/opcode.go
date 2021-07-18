@@ -37,6 +37,9 @@ const (
 	LE
 	OR
 	AND
+	NEG
+	BOOL_T
+	BOOL_F
 )
 
 func (op Opcode) String() string {
@@ -97,6 +100,12 @@ func (op Opcode) String() string {
 		return "OR"
 	case AND:
 		return "AND"
+	case NEG:
+		return "NEG"
+	case BOOL_T:
+		return "BOOL_T"
+	case BOOL_F:
+		return "BOOL_F"
 	default:
 		panic(fmt.Errorf("unreachable: %d", op))
 	}

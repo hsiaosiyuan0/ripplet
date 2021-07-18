@@ -23,6 +23,7 @@ statement:
 expression:
   expression '[' expression ']'                         # SubscriptExpr
   | expression Dot Identifier                           # MemberDotExpr
+  | '-' expression                                      # NegativeExpr                              
   | Typeof expression                                   # TypeofExpr
   | Not expression                                      # NotExpr
   | expression arguments                                # CallExpr

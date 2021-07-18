@@ -41,6 +41,9 @@ type RippletParserListener interface {
 	// EnterPowerExpr is called when entering the PowerExpr production.
 	EnterPowerExpr(c *PowerExprContext)
 
+	// EnterNegativeExpr is called when entering the NegativeExpr production.
+	EnterNegativeExpr(c *NegativeExprContext)
+
 	// EnterArrayExpr is called when entering the ArrayExpr production.
 	EnterArrayExpr(c *ArrayExprContext)
 
@@ -259,6 +262,9 @@ type RippletParserListener interface {
 
 	// ExitPowerExpr is called when exiting the PowerExpr production.
 	ExitPowerExpr(c *PowerExprContext)
+
+	// ExitNegativeExpr is called when exiting the NegativeExpr production.
+	ExitNegativeExpr(c *NegativeExprContext)
 
 	// ExitArrayExpr is called when exiting the ArrayExpr production.
 	ExitArrayExpr(c *ArrayExprContext)

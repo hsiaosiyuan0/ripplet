@@ -36,7 +36,7 @@ type FnShape struct {
 func NewFnShape() *FnShape {
 	return &FnShape{
 		Instrs: make([]int, 0),
-		Upvals: make(map[string]UpLoc, 0),
+		Upvals: make(map[string]UpLoc),
 		Subs:   make([]*FnShape, 0),
 	}
 }
@@ -46,7 +46,7 @@ func (f *FnShape) Dump(chunk *Chunk) string {
 	for i := 0; i < len(f.Instrs); i++ {
 		op := Opcode(f.Instrs[i])
 		switch op {
-		case CONST, LOAD, STORE, CLOSURE, CONCAT, JMP, JMP_F:
+		case CONST, LOAD, STORE, CLOSURE, CONCAT, JMP, JMP_F, NEG:
 			fmt.Fprint(&b, op.String()+"\n")
 			i++
 			fmt.Fprintf(&b, "OPD_%d\n", f.Instrs[i])

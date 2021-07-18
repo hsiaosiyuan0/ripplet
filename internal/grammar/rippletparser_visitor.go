@@ -41,6 +41,9 @@ type RippletParserVisitor interface {
 	// Visit a parse tree produced by RippletParser#PowerExpr.
 	VisitPowerExpr(ctx *PowerExprContext) interface{}
 
+	// Visit a parse tree produced by RippletParser#NegativeExpr.
+	VisitNegativeExpr(ctx *NegativeExprContext) interface{}
+
 	// Visit a parse tree produced by RippletParser#ArrayExpr.
 	VisitArrayExpr(ctx *ArrayExprContext) interface{}
 

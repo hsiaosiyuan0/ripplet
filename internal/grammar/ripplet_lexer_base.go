@@ -34,7 +34,9 @@ func (l *RippletLexerBase) IsRegexCanStart() bool {
 		return true
 	}
 	switch l.lastToken.GetTokenType() {
-	case RippletLexerIdentifier, RippletLexerNilLiteral, RippletLexerBooLiteral, RippletLexerIntLiteral, RippletLexerHexLiteral, RippletLexerRealLiteral, RippletLexerStringClose:
+	case RippletLexerIdentifier, RippletLexerNilLiteral,
+		RippletLexerBooLiteral, RippletLexerIntLiteral,
+		RippletLexerHexLiteral, RippletLexerRealLiteral, RippletLexerStringClose:
 		return false
 	default:
 		return true

@@ -47,24 +47,24 @@ func (f *FnShape) Dump(chunk *Chunk) string {
 		op := Opcode(f.Instrs[i])
 		switch op {
 		case CONST, LOAD, STORE, CLOSURE, CONCAT, JMP, JMP_F, NEG:
-			fmt.Fprint(&b, op.String()+"\n")
+			fmt.Fprintf(&b, "  %s\n", op.String())
 			i++
-			fmt.Fprintf(&b, "OPD_%d\n", f.Instrs[i])
+			fmt.Fprintf(&b, "  OPD_%d\n", f.Instrs[i])
 		case CALL, ARR:
-			fmt.Fprint(&b, op.String()+"\n")
+			fmt.Fprintf(&b, "  %s\n", op.String())
 			i++
-			fmt.Fprintf(&b, "CNT_%d\n", f.Instrs[i])
+			fmt.Fprintf(&b, "  CNT_%d\n", f.Instrs[i])
 		case LOAD_UP, STORE_UP, LOAD_EXT:
-			fmt.Fprint(&b, op.String()+"\n")
+			fmt.Fprintf(&b, "  %s\n", op.String())
 			i++
-			fmt.Fprintf(&b, "NAME_%s\n", chunk.ConstStr(f.Instrs[i]))
+			fmt.Fprintf(&b, "  NAME_%s\n", chunk.ConstStr(f.Instrs[i]))
 		default:
-			fmt.Fprintf(&b, "%s\n", op.String())
+			fmt.Fprintf(&b, "  %s\n", op.String())
 		}
 	}
 
 	for i, sub := range f.Subs {
-		fmt.Fprintf(&b, "\nSub: %d\n", i)
+		fmt.Fprintf(&b, "\nfn: %d\n", i)
 		fmt.Fprintf(&b, "%s", sub.Dump(chunk))
 	}
 	return b.String()
@@ -144,6 +144,7 @@ func (c *Chunk) AddConstNum(num float64) int {
 }
 
 func (c *Chunk) Dump() string {
+	fmt.Println("main:")
 	return c.Fn.Dump(c)
 }
 

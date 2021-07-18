@@ -465,6 +465,7 @@ func (v *CodegenVisitor) VisitStringInterpExpr(ctx *parser.StringInterpExprConte
 }
 
 func (v *CodegenVisitor) VisitStringLiteral(ctx *parser.StringLiteralContext) interface{} {
+	// TODO: process escape sequence
 	for _, child := range ctx.GetChildren() {
 		if val, ok := child.(*parser.StringQuotedContext); ok {
 			ci := v.chunk.AddConstStr(val.GetText())

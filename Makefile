@@ -1,4 +1,4 @@
-ripplet: cmd/ripplet/*.go pkg/*/*.go internal/*/*.go go.mod
+ripplet: cmd/ripplet/*.go internal/*/*.go go.mod
 	go build ./cmd/ripplet
 
 clean:
@@ -7,5 +7,5 @@ clean:
 antlr:
 	go run scripts/antlr/mod.go
 
-test: cmd/ripplet/*.go pkg/*/*.go internal/*/*.go go.mod
+test: cmd/ripplet/*.go internal/*/*.go go.mod
 	go test ./...

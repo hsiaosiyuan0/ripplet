@@ -38,13 +38,13 @@ func TestVarDec(t *testing.T) {
 	b := 0xff
 	`, `
 	CONST
-	INDEX_0
+	OPD_0
 	STORE
-	INDEX_0
+	OPD_0
 	CONST
-	INDEX_1
+	OPD_1
 	STORE
-	INDEX_1
+	OPD_1
 `)
 }
 
@@ -54,15 +54,15 @@ func TestPrintHello(t *testing.T) {
 	print(a)
 	`, `
 	CONST
-	INDEX_0
+	OPD_0
 	CONCAT
-	INDEX_1
+	OPD_1
 	STORE
-	INDEX_0
-	LOAD_GL
+	OPD_0
+	LOAD_EXT
 	NAME_print
 	LOAD
-	INDEX_0
+	OPD_0
 	CALL
 	CNT_2
 `)

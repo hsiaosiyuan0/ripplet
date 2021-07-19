@@ -198,3 +198,14 @@ func TestEq(t *testing.T) {
   assert(c isnt b, true)
   `)
 }
+
+func TestCalRec(t *testing.T) {
+	runAssert(`
+  f := (n) => {
+    if n is 0 then 0
+    else if n is 1 then 1
+    else f(n - 1) + f(n - 2)
+  }
+  assert(f(10), 55)
+  `)
+}

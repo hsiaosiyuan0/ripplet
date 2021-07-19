@@ -143,7 +143,16 @@ func (v *Vm) dispatch(op asm.Opcode) {
 
 	case asm.STORE:
 		i := v.fetchInstr()
-		v.cf.locals[i] = v.popOperand()
+
+		local := v.cf.locals[i]
+		opd := v.popOperand()
+		if local == nil {
+			v.cf.locals[i] = opd
+		} else {
+			// keep reference
+			local.Typ = opd.Typ
+			local.Data = opd.Data
+		}
 
 	case asm.LOAD:
 		i := v.fetchInstr()
@@ -225,7 +234,15 @@ func (v *Vm) dispatch(op asm.Opcode) {
 
 		for name, loc := range shape.Upvals {
 			if loc.Typ == asm.UP_LOC_LOCAL {
-				closure.uppers[name] = v.cf.locals[loc.At.(int)]
+				i := loc.At.(int)
+				local := v.cf.locals[i]
+				if local == nil {
+					local = &Object{
+						Typ: NIL,
+					}
+					v.cf.locals[i] = local
+				}
+				closure.uppers[name] = local
 			} else {
 				closure.uppers[name] = v.cf.uppers[name]
 			}

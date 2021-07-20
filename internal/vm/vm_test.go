@@ -217,3 +217,18 @@ func TestStringInterp(t *testing.T) {
   assert("a: {a} {b}", "a: hello world 1")
   `)
 }
+
+func TestVarDecAndAssignReturn(t *testing.T) {
+	runAssert(`
+  a := 1
+  c := 2
+  b := {
+    a = a + 1
+  }
+  c = {
+    a = a + 1
+  }
+  assert(b, nil)
+  assert(c, nil)
+  `)
+}

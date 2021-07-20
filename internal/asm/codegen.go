@@ -483,6 +483,11 @@ func (v *CodegenVisitor) VisitStringLiteral(ctx *parser.StringLiteralContext) in
 	return nil
 }
 
+func (v *CodegenVisitor) VisitNilLiteral(ctx *parser.NilLiteralContext) interface{} {
+	v.emitOpcode(NIL)
+	return nil
+}
+
 func (v *CodegenVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 	if ctx.NumberLiteral() != nil {
 		return v.VisitNumberLiteral(ctx.NumberLiteral().(*parser.NumberLiteralContext))
@@ -494,6 +499,10 @@ func (v *CodegenVisitor) VisitLiteral(ctx *parser.LiteralContext) interface{} {
 
 	if ctx.BoolLiteral() != nil {
 		return v.VisitBoolLiteral(ctx.BoolLiteral().(*parser.BoolLiteralContext))
+	}
+
+	if ctx.NilLiteral() != nil {
+		return v.VisitNilLiteral(ctx.NilLiteral().(*parser.NilLiteralContext))
 	}
 	return nil
 }

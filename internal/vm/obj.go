@@ -235,6 +235,9 @@ func (o *Object) EQ(rhs *Object) *Object {
 		if op1 == op2 {
 			return tureObj
 		}
+
+	case NIL:
+		return tureObj
 	}
 
 	return falseObj

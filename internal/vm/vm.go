@@ -110,6 +110,9 @@ func (v *Vm) pushOperand(obj *Object) {
 
 func (v *Vm) popOperand() *Object {
 	cnt := len(v.opds)
+	if cnt == 0 {
+		return nilObj
+	}
 	opd, opds := v.opds[cnt-1], v.opds[:cnt-1]
 	v.opds = opds
 	return opd
@@ -383,6 +386,9 @@ func (v *Vm) dispatch(op asm.Opcode) {
 
 	case asm.BOOL_F:
 		v.pushOperand(falseObj)
+
+	case asm.NIL:
+		v.pushOperand(nilObj)
 
 	default:
 		fmt.Printf("%s\n", op.String())

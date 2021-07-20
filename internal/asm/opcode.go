@@ -40,6 +40,7 @@ const (
 	NEG
 	BOOL_T
 	BOOL_F
+	NIL
 )
 
 func (op Opcode) String() string {
@@ -106,6 +107,8 @@ func (op Opcode) String() string {
 		return "BOOL_T"
 	case BOOL_F:
 		return "BOOL_F"
+	case NIL:
+		return "NIL"
 	default:
 		panic(fmt.Errorf("unreachable: %d", op))
 	}

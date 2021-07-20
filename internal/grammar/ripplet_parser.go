@@ -88,11 +88,11 @@ var parserATN = []uint16{
 	2, 100, 465, 3, 2, 2, 2, 102, 470, 3, 2, 2, 2, 104, 472, 3, 2, 2, 2, 106,
 	108, 5, 4, 3, 2, 107, 106, 3, 2, 2, 2, 108, 111, 3, 2, 2, 2, 109, 107,
 	3, 2, 2, 2, 109, 110, 3, 2, 2, 2, 110, 112, 3, 2, 2, 2, 111, 109, 3, 2,
-	2, 2, 112, 113, 7, 2, 2, 3, 113, 3, 3, 2, 2, 2, 114, 126, 5, 30, 16, 2,
-	115, 126, 5, 62, 32, 2, 116, 126, 5, 64, 33, 2, 117, 126, 5, 8, 5, 2, 118,
-	126, 5, 32, 17, 2, 119, 126, 5, 24, 13, 2, 120, 126, 5, 26, 14, 2, 121,
-	126, 5, 12, 7, 2, 122, 126, 5, 46, 24, 2, 123, 126, 5, 60, 31, 2, 124,
-	126, 5, 10, 6, 2, 125, 114, 3, 2, 2, 2, 125, 115, 3, 2, 2, 2, 125, 116,
+	2, 2, 112, 113, 7, 2, 2, 3, 113, 3, 3, 2, 2, 2, 114, 126, 5, 62, 32, 2,
+	115, 126, 5, 64, 33, 2, 116, 126, 5, 8, 5, 2, 117, 126, 5, 32, 17, 2, 118,
+	126, 5, 24, 13, 2, 119, 126, 5, 26, 14, 2, 120, 126, 5, 12, 7, 2, 121,
+	126, 5, 46, 24, 2, 122, 126, 5, 60, 31, 2, 123, 126, 5, 10, 6, 2, 124,
+	126, 5, 30, 16, 2, 125, 114, 3, 2, 2, 2, 125, 115, 3, 2, 2, 2, 125, 116,
 	3, 2, 2, 2, 125, 117, 3, 2, 2, 2, 125, 118, 3, 2, 2, 2, 125, 119, 3, 2,
 	2, 2, 125, 120, 3, 2, 2, 2, 125, 121, 3, 2, 2, 2, 125, 122, 3, 2, 2, 2,
 	125, 123, 3, 2, 2, 2, 125, 124, 3, 2, 2, 2, 126, 5, 3, 2, 2, 2, 127, 128,
@@ -135,7 +135,7 @@ var parserATN = []uint16{
 	2, 2, 2, 218, 220, 5, 22, 12, 2, 219, 218, 3, 2, 2, 2, 220, 221, 3, 2,
 	2, 2, 221, 219, 3, 2, 2, 2, 221, 222, 3, 2, 2, 2, 222, 21, 3, 2, 2, 2,
 	223, 224, 7, 58, 2, 2, 224, 225, 5, 52, 27, 2, 225, 226, 5, 60, 31, 2,
-	226, 23, 3, 2, 2, 2, 227, 228, 5, 50, 26, 2, 228, 229, 7, 43, 2, 2, 229,
+	226, 23, 3, 2, 2, 2, 227, 228, 5, 6, 4, 2, 228, 229, 7, 43, 2, 2, 229,
 	230, 5, 4, 3, 2, 230, 25, 3, 2, 2, 2, 231, 232, 5, 28, 15, 2, 232, 233,
 	7, 42, 2, 2, 233, 234, 5, 4, 3, 2, 234, 27, 3, 2, 2, 2, 235, 236, 5, 50,
 	26, 2, 236, 29, 3, 2, 2, 2, 237, 238, 5, 6, 4, 2, 238, 31, 3, 2, 2, 2,
@@ -592,16 +592,6 @@ func NewStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, in
 
 func (s *StatementContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *StatementContext) ExprStmt() IExprStmtContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IExprStmtContext)(nil)).Elem(), 0)
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExprStmtContext)
-}
-
 func (s *StatementContext) IfStmt() IIfStmtContext {
 	var t = s.GetTypedRuleContext(reflect.TypeOf((*IIfStmtContext)(nil)).Elem(), 0)
 
@@ -702,6 +692,16 @@ func (s *StatementContext) ReturnStmt() IReturnStmtContext {
 	return t.(IReturnStmtContext)
 }
 
+func (s *StatementContext) ExprStmt() IExprStmtContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IExprStmtContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprStmtContext)
+}
+
 func (s *StatementContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
@@ -759,77 +759,77 @@ func (p *RippletParser) Statement() (localctx IStatementContext) {
 		p.EnterOuterAlt(localctx, 1)
 		{
 			p.SetState(112)
-			p.ExprStmt()
+			p.IfStmt()
 		}
 
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
 			p.SetState(113)
-			p.IfStmt()
+			p.RepeatStmt()
 		}
 
 	case 3:
 		p.EnterOuterAlt(localctx, 3)
 		{
 			p.SetState(114)
-			p.RepeatStmt()
+			p.BreakStmt()
 		}
 
 	case 4:
 		p.EnterOuterAlt(localctx, 4)
 		{
 			p.SetState(115)
-			p.BreakStmt()
+			p.MatchStmt()
 		}
 
 	case 5:
 		p.EnterOuterAlt(localctx, 5)
 		{
 			p.SetState(116)
-			p.MatchStmt()
+			p.AssignStmt()
 		}
 
 	case 6:
 		p.EnterOuterAlt(localctx, 6)
 		{
 			p.SetState(117)
-			p.AssignStmt()
+			p.VarDeclareStmt()
 		}
 
 	case 7:
 		p.EnterOuterAlt(localctx, 7)
 		{
 			p.SetState(118)
-			p.VarDeclareStmt()
+			p.ObjDeclareStmt()
 		}
 
 	case 8:
 		p.EnterOuterAlt(localctx, 8)
 		{
 			p.SetState(119)
-			p.ObjDeclareStmt()
+			p.FnDeclareStmt()
 		}
 
 	case 9:
 		p.EnterOuterAlt(localctx, 9)
 		{
 			p.SetState(120)
-			p.FnDeclareStmt()
+			p.BlockStmt()
 		}
 
 	case 10:
 		p.EnterOuterAlt(localctx, 10)
 		{
 			p.SetState(121)
-			p.BlockStmt()
+			p.ReturnStmt()
 		}
 
 	case 11:
 		p.EnterOuterAlt(localctx, 11)
 		{
 			p.SetState(122)
-			p.ReturnStmt()
+			p.ExprStmt()
 		}
 
 	}
@@ -3660,14 +3660,14 @@ func NewAssignStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, i
 
 func (s *AssignStmtContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *AssignStmtContext) Identifer() IIdentiferContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IIdentiferContext)(nil)).Elem(), 0)
+func (s *AssignStmtContext) Expression() IExpressionContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IExpressionContext)(nil)).Elem(), 0)
 
 	if t == nil {
 		return nil
 	}
 
-	return t.(IIdentiferContext)
+	return t.(IExpressionContext)
 }
 
 func (s *AssignStmtContext) Assign() antlr.TerminalNode {
@@ -3737,7 +3737,7 @@ func (p *RippletParser) AssignStmt() (localctx IAssignStmtContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(225)
-		p.Identifer()
+		p.expression(0)
 	}
 	{
 		p.SetState(226)

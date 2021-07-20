@@ -21,7 +21,8 @@ const (
 	DIV
 	MOD
 	ARR
-	SUBSCRIPT
+	LOAD_ARR
+	STORE_ARR
 	CONCAT
 	CALL
 	RET
@@ -77,8 +78,10 @@ func (op Opcode) String() string {
 		return "DIV"
 	case ARR:
 		return "ARR"
-	case SUBSCRIPT:
-		return "SUBSCRIPT"
+	case LOAD_ARR:
+		return "LOAD_ARR"
+	case STORE_ARR:
+		return "STORE_ARR"
 	case TEST:
 		return "TEST"
 	case JMP_F:

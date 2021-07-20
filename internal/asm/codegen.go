@@ -51,10 +51,6 @@ type CodegenVisitor struct {
 	curFnPlot *FnPlot
 	symtab    *SymTab
 
-	inVarDecLhs       bool
-	inFormalParamList bool
-	inAssignLhs       bool
-
 	repeatStk []*RepeatInfo
 
 	chunk *Chunk
@@ -80,8 +76,6 @@ func (v *CodegenVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitVarDeclareLhs(val)
 	case *parser.StatementContext:
 		return v.VisitStatement(val)
-	case *parser.ExprStmtContext:
-		return v.VisitExprStmt(val)
 	case *parser.LiteralExprContext:
 		return v.VisitLiteralExpr(val)
 	case *parser.LiteralContext:
@@ -91,7 +85,7 @@ func (v *CodegenVisitor) Visit(tree antlr.ParseTree) interface{} {
 	case *parser.FnExprContext:
 		return v.VisitFnExpr(val)
 	case *parser.IdentifierExprContext:
-		return v.VisitIdentifierExpr(val)
+		return v.VisitIdentifierExpr(val, false, true, false)
 	case *parser.AssignStmtContext:
 		return v.VisitAssignStmt(val)
 	case *parser.CallExprContext:
@@ -102,10 +96,12 @@ func (v *CodegenVisitor) Visit(tree antlr.ParseTree) interface{} {
 		return v.VisitAddExpr(val)
 	case *parser.MulExprContext:
 		return v.VisitMulExpr(val)
+	case *parser.SubscriptExprContext:
+		return v.VisitSubscriptExpr(val, false)
 	case *parser.ArrayExprContext:
 		return v.VisitArrayExpr(val)
-	case *parser.SubscriptExprContext:
-		return v.VisitSubscriptExpr(val)
+	case *parser.ExprStmtContext:
+		return v.VisitExprStmt(val)
 	case *parser.IfStmtContext:
 		return v.VisitIfStmt(val)
 	case *parser.BlockStmtContext:
@@ -299,10 +295,15 @@ func (v *CodegenVisitor) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 	return nil
 }
 
-func (v *CodegenVisitor) VisitSubscriptExpr(ctx *parser.SubscriptExprContext) interface{} {
+func (v *CodegenVisitor) VisitSubscriptExpr(ctx *parser.SubscriptExprContext, store bool) interface{} {
 	v.Visit(ctx.Expression(0))
 	v.Visit(ctx.Expression(1))
-	v.emitOpcode(SUBSCRIPT)
+
+	if store {
+		v.emitOpcode(STORE_ARR)
+	} else {
+		v.emitOpcode(LOAD_ARR)
+	}
 	return nil
 }
 
@@ -377,29 +378,10 @@ func (v *CodegenVisitor) resolveUpChain(fn *FnPlot, name string) {
 	v.resolveUpChain(fn.Parent, name)
 }
 
-func (v *CodegenVisitor) VisitIdentifierExpr(ctx *parser.IdentifierExprContext) interface{} {
-	name := ctx.GetText()
-	if v.curSymtab().HasLocal(name) {
-		v.emitOpcode(LOAD)
-		v.emitInt(v.curSymtab().LocalIdx(name))
-	} else if v.curSymtab().HasBinding(name) {
-		v.resolveUpChain(v.curFnPlot, name)
-
-		v.emitOpcode(LOAD_UP)
-		v.emitString(name)
-	} else if v.symtab.HasExternal(name) {
-		v.emitOpcode(LOAD_EXT)
-		v.emitString(name)
-	}
-	return nil
-}
-
 func (v *CodegenVisitor) VisitFormalParamList(ctx *parser.FormalParamListContext) interface{} {
-	v.inFormalParamList = true
 	for _, id := range ctx.AllIdentifer() {
-		v.VisitIdentifer(id.(*parser.IdentiferContext))
+		v.VisitIdentifer(id.(*parser.IdentiferContext), false, true, true)
 	}
-	v.inFormalParamList = false
 	return nil
 }
 
@@ -542,35 +524,53 @@ func (v *CodegenVisitor) VisitChildren(node antlr.RuleNode) interface{} {
 	}
 }
 
-func (v *CodegenVisitor) VisitIdentifer(ctx *parser.IdentiferContext) interface{} {
+func (v *CodegenVisitor) VisitIdentifer(ctx *parser.IdentiferContext, store bool, load bool, arg bool) interface{} {
 	name := ctx.GetText()
-	if v.inVarDecLhs || (v.inAssignLhs && v.curSymtab().HasLocal(name)) {
-		idx := v.curSymtab().LocalIdx(name)
-		v.emitOpcode(STORE)
-		v.emitInt(idx)
-		return nil
-	}
 
-	if v.inAssignLhs {
+	if store {
+		if v.curSymtab().HasLocal(name) {
+			idx := v.curSymtab().LocalIdx(name)
+			v.emitOpcode(STORE)
+			v.emitInt(idx)
+			return nil
+		}
+
 		v.emitOpcode(STORE_UP)
 		v.emitString(name)
 		return nil
 	}
 
-	if v.inFormalParamList {
-		// TODO: varargs
-		v.emitOpcode(LOAD_ARG)
-		v.emitInt(v.curSymtab().LocalIdx(name))
+	if load {
+		if arg {
+			v.emitOpcode(LOAD_ARG)
+			v.emitInt(v.curSymtab().LocalIdx(name))
+			return nil
+		}
+
+		if v.curSymtab().HasLocal(name) {
+			v.emitOpcode(LOAD)
+			v.emitInt(v.curSymtab().LocalIdx(name))
+		} else if v.curSymtab().HasBinding(name) {
+			v.resolveUpChain(v.curFnPlot, name)
+
+			v.emitOpcode(LOAD_UP)
+			v.emitString(name)
+		} else if v.symtab.HasExternal(name) {
+			v.emitOpcode(LOAD_EXT)
+			v.emitString(name)
+		}
 	}
 
 	return nil
 }
 
-func (v *CodegenVisitor) VisitVarDeclareLhs(ctx *parser.VarDeclareLhsContext) interface{} {
-	v.inVarDecLhs = true
-	v.VisitIdentifer(ctx.Identifer().(*parser.IdentiferContext))
-	v.inVarDecLhs = false
+func (v *CodegenVisitor) VisitIdentifierExpr(ctx *parser.IdentifierExprContext, store bool, load bool, arg bool) interface{} {
+	v.VisitIdentifer(ctx.Identifer().(*parser.IdentiferContext), store, load, arg)
 	return nil
+}
+
+func (v *CodegenVisitor) VisitVarDeclareLhs(ctx *parser.VarDeclareLhsContext) interface{} {
+	return v.VisitIdentifer(ctx.Identifer().(*parser.IdentiferContext), true, false, false)
 }
 
 func (v *CodegenVisitor) VisitVarDeclareStmt(ctx *parser.VarDeclareStmtContext) interface{} {
@@ -581,10 +581,15 @@ func (v *CodegenVisitor) VisitVarDeclareStmt(ctx *parser.VarDeclareStmtContext) 
 
 func (v *CodegenVisitor) VisitAssignStmt(ctx *parser.AssignStmtContext) interface{} {
 	v.Visit(ctx.Statement())
-	v.inAssignLhs = true
-	v.VisitIdentifer(ctx.Identifer().(*parser.IdentiferContext))
-	v.inAssignLhs = false
-	return nil
+
+	switch val := ctx.Expression().(type) {
+	case *parser.IdentifierExprContext:
+		return v.VisitIdentifierExpr(val, true, false, false)
+	case *parser.SubscriptExprContext:
+		return v.VisitSubscriptExpr(val, true)
+	default:
+		return v.Visit(val)
+	}
 }
 
 func (v *CodegenVisitor) VisitArguments(ctx *parser.ArgumentsContext) int {

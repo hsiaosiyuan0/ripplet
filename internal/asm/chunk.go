@@ -46,7 +46,7 @@ func (f *FnShape) Dump(chunk *Chunk) string {
 	for i := 0; i < len(f.Instrs); i++ {
 		op := Opcode(f.Instrs[i])
 		switch op {
-		case CONST, LOAD, STORE, CLOSURE, CONCAT, JMP, JMP_F, NEG:
+		case CONST, LOAD, STORE, CLOSURE, CONCAT, JMP, JMP_F, NEG, LOAD_ARG:
 			fmt.Fprintf(&b, "  %s\n", op.String())
 			i++
 			fmt.Fprintf(&b, "  OPD_%d\n", f.Instrs[i])
@@ -57,7 +57,13 @@ func (f *FnShape) Dump(chunk *Chunk) string {
 		case LOAD_UP, STORE_UP, LOAD_EXT:
 			fmt.Fprintf(&b, "  %s\n", op.String())
 			i++
-			fmt.Fprintf(&b, "  NAME_%s\n", chunk.ConstStr(f.Instrs[i]))
+
+			idx := f.Instrs[i]
+			str := fmt.Sprintf("@wrong_idx_%d", idx)
+			if chunk.HasConstStr(idx) {
+				str = chunk.ConstStr(idx)
+			}
+			fmt.Fprintf(&b, "  NAME_%s\n", str)
 		default:
 			fmt.Fprintf(&b, "  %s\n", op.String())
 		}
@@ -95,6 +101,10 @@ func NewChunk() *Chunk {
 		Ver:    0,
 		Consts: make([]*Const, 0),
 	}
+}
+
+func (c *Chunk) HasConstStr(i int) bool {
+	return i < len(c.Consts)
 }
 
 func (c *Chunk) ConstStr(i int) string {

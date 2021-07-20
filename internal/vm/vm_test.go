@@ -232,3 +232,11 @@ func TestVarDecAndAssignReturn(t *testing.T) {
   assert(c, nil)
   `)
 }
+
+func TestStoreArr(t *testing.T) {
+	runAssert(`
+  a := [1, 2, 3]
+  a[1] = 5
+  assert(a[1], 5)
+  `)
+}

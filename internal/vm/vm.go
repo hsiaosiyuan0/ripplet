@@ -305,26 +305,33 @@ func (v *Vm) dispatch(op asm.Opcode) {
 
 	case asm.ARR:
 		cnt := v.fetchInstr()
-		arr := make([]*Object, cnt)
+		arr := NewArray(cnt)
 		for i := cnt - 1; i >= 0; i-- {
-			arr[i] = v.popOperand()
+			arr.Set(i, v.popOperand())
 		}
 		v.pushOperand(&Object{
 			Typ:  ARR,
 			Data: arr,
 		})
 
-	case asm.SUBSCRIPT:
+	case asm.LOAD_ARR:
 		// TODO: type assert
-		idx := int(v.popOperand().Data.(float64))
-		arr := v.popOperand().Data.([]*Object)
+		i := int(v.popOperand().Data.(float64))
+		arr := v.popOperand().MustArray()
 		// TODO: boundary check
-		item := arr[idx]
+		item := arr.Get(i)
 		v.pushOperand(item)
+
+	case asm.STORE_ARR:
+		// TODO: type assert
+		i := int(v.popOperand().Data.(float64))
+		arr := v.popOperand().MustArray()
+		opd := v.popOperand()
+		arr.Set(i, opd)
 
 	case asm.TEST:
 		opd := v.popOperand()
-		v.pushOperand(opd.AsBool())
+		v.pushOperand(opd.Bool())
 
 	case asm.JMP_F:
 		cond := v.popOperand()
@@ -353,8 +360,8 @@ func (v *Vm) dispatch(op asm.Opcode) {
 		}
 
 	case asm.AND, asm.OR:
-		op2 := v.popOperand().AsBool().Data.(bool)
-		op1 := v.popOperand().AsBool().Data.(bool)
+		op2 := v.popOperand().Bool().Data.(bool)
+		op1 := v.popOperand().Bool().Data.(bool)
 
 		if op == asm.ADD && op1 && op2 {
 			v.pushOperand(tureObj)

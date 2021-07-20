@@ -7,8 +7,7 @@ options {
 program: statement* EOF;
 
 statement:
-  exprStmt
-  | ifStmt
+  ifStmt
   | repeatStmt
 	| breakStmt
   | matchStmt
@@ -18,6 +17,7 @@ statement:
   | fnDeclareStmt
   | blockStmt
 	| returnStmt
+  | exprStmt
   ;
 
 expression:
@@ -61,7 +61,7 @@ objMethods: objMethod+;
 
 objMethod: Identifier formalParams blockStmt;
 
-assignStmt: identifer '=' statement;
+assignStmt: expression '=' statement;
 
 varDeclareStmt: varDeclareLhs ':=' statement;
 

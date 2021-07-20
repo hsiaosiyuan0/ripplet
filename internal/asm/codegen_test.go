@@ -70,3 +70,28 @@ func TestPrintHello(t *testing.T) {
 	CNT_2
 `)
 }
+
+func TestStoreArr(t *testing.T) {
+	assertOpcodesEq(t, `
+  a := [1, 2, 3]
+  a[1] = 5
+	`, `
+  CONST
+  OPD_0
+  CONST
+  OPD_1
+  CONST
+  OPD_2
+  ARR
+  CNT_3
+  STORE
+  OPD_0
+  CONST
+  OPD_3
+  LOAD
+  OPD_0
+  CONST
+  OPD_0
+  STORE_ARR
+`)
+}

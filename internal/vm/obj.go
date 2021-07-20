@@ -86,7 +86,7 @@ func (o *Object) String() string {
 	}
 }
 
-func (o *Object) AsBool() *Object {
+func (o *Object) Bool() *Object {
 	switch o.Typ {
 	case NUM:
 		n := o.Data.(float64)
@@ -241,4 +241,11 @@ func (o *Object) EQ(rhs *Object) *Object {
 	}
 
 	return falseObj
+}
+
+func (o *Object) MustArray() *Array {
+	if o.Typ != ARR {
+		panic(fmt.Errorf("object is not array: %v", o.Typ))
+	}
+	return o.Data.(*Array)
 }

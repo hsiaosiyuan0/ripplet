@@ -209,3 +209,11 @@ func TestCalRec(t *testing.T) {
   assert(f(10), 55)
   `)
 }
+
+func TestStringInterp(t *testing.T) {
+	runAssert(`
+  a := "hello world"
+  b := 1
+  assert("a: {a} {b}", "a: hello world 1")
+  `)
+}

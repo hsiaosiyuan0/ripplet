@@ -213,9 +213,8 @@ func (v *Vm) dispatch(op asm.Opcode) {
 
 		for i := 0; i < subsLen; i++ {
 			opd := v.popOperand()
-			// TODO: toString
-			ss := opd.Data.(string)
-			subs = append(subs, ss)
+			ss := opd.String()
+			subs[subsLen-i-1] = ss
 		}
 
 		v.pushOperand(&Object{
